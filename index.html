@@ -212,6 +212,7 @@ button:focus:not(:focus-visible){outline:none}
     </div>
     <div class="sidebar-actions">
       <button class="s-btn" onclick="exportCSV()">📥 Esporta CSV</button>
+      <button class="s-btn" onclick="importCSV()">📂 Importa CSV</button>
       <button class="s-btn primary" onclick="showStats()">📊 Riepilogo mese</button>
     </div>
   </aside>
@@ -251,7 +252,8 @@ button:focus:not(:focus-visible){outline:none}
   </main>
 </div>
 <div class="mobile-bar">
-  <button class="mb-btn" onclick="exportCSV()">📥 CSV</button>
+  <button class="mb-btn" onclick="exportCSV()">📥 Esporta</button>
+  <button class="mb-btn" onclick="importCSV()">📂 Importa</button>
   <button class="mb-btn primary" onclick="showStats()">📊 Riepilogo</button>
 </div>
 <div class="overlay" id="overlay">
@@ -402,6 +404,29 @@ function showStats(){
 }
 function closeStatsModal(){document.getElementById('stats-overlay').classList.remove('open');}
 document.getElementById('stats-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('stats-overlay'))closeStatsModal();});
+function importCSV(){
+  const input=document.createElement('input');
+  input.type='file';input.accept='.csv';
+  input.onchange=function(e){
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      const lines=ev.target.result.replace(/^\uFEFF/,'').split('\n').filter(l=>l.trim());
+      if(lines.length<2)return;
+      const valid=['lavoro','ferie','riposo','festivo'];
+      let imported=0;const promises=[];
+      for(let i=1;i<lines.length;i++){
+        const cols=lines[i].split(';');if(cols.length<5)continue;
+        const key=cols[0].trim(),type=cols[2].trim(),bp=parseInt(cols[3])||0,acc=cols[4].trim()==='Sì';
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(key)||!valid.includes(type))continue;
+        const entry={type,bp,acc};_cache[key]=entry;promises.push(dbSet(key,entry));imported++;
+      }
+      Promise.all(promises).then(()=>{renderCal();alert(`Importati ${imported} giorni.`);}).catch(()=>{renderCal();alert(`Importati ${imported} giorni (errore DB).`);});
+    };
+    reader.readAsText(file,'UTF-8');
+  };
+  input.click();
+}
 function exportCSV(){
   const data=load(),rows=[['Data','Giorno','Tipo','Buoni usati','Accumulato','Valore €']];
   Object.keys(data).sort().forEach(k=>{if(k==='__banner__')return;const e=data[k];const [ky,kmo,kd]=k.split('-').map(Number);const dt=new Date(ky,kmo-1,kd);const dow=dt.getDay();const di=dow===0?6:dow-1;rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);});
@@ -411,7 +436,7 @@ function exportCSV(){
   const a=document.createElement('a');a.href=url;a.download='buoni_pasto.csv';a.click();URL.revokeObjectURL(url);
 }
 if('serviceWorker' in navigator){
-  const sw=`const CACHE='bp-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
+  const sw=`const CACHE='bp-v4';self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
   const blob=new Blob([sw],{type:'application/javascript'});
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
