@@ -405,7 +405,7 @@ function closeStatsModal(){document.getElementById('stats-overlay').classList.re
 document.getElementById('stats-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('stats-overlay'))closeStatsModal();});
 function exportCSV(){
   const data=load(),rows=[['Data','Giorno','Tipo','Buoni usati','Accumulato','Valore €']];
-  Object.keys(data).sort().forEach(k=>{if(k==='__banner__')return;const e=data[k];const dt=new Date(k);const dow=dt.getDay();const di=dow===0?6:dow-1;rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);});
+  Object.keys(data).sort().forEach(k=>{if(k==='__banner__')return;const e=data[k];const [ky,kmo,kd]=k.split('-').map(Number);const dt=new Date(ky,kmo-1,kd);const dow=dt.getDay();const di=dow===0?6:dow-1;rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);});
   const csv=rows.map(r=>r.join(';')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
