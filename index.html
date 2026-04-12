@@ -23,7 +23,7 @@
   --sky:#4A82C4;--sky-lt:#E8F1FB;--sky-md:#B8D0ED;
   --lavender:#8E72C4;--lav-lt:#F1ECFB;
   --text:#2D3436;--text2:#636E72;--text3:#A0AAB0;
-  --bg:#FAFAF8;--bg2:#F1F0EC;--bg3:#E8E7E2;
+  --bg:#D8E8CC;--bg2:#CCDFC0;--bg3:#C0D5B3;
   --card:#FFFFFF;
   --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
   --shadow:0 2px 12px rgba(0,0,0,0.06);
@@ -136,7 +136,7 @@ button:focus:not(:focus-visible){outline:none}
 .m-date{font-size:12px;color:var(--text3);text-align:center;margin-bottom:2px}
 .m-title{font-size:18px;font-weight:700;color:var(--text);text-align:center;margin-bottom:20px;letter-spacing:-0.3px}
 .s-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.types{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
 .tbtn{border:1.5px solid var(--border2);border-radius:14px;padding:12px 4px;cursor:pointer;text-align:center;background:var(--bg3);transition:all .15s}
 .tbtn:active{transform:scale(.94)}
 .tbtn .tbi{font-size:22px;margin-bottom:5px;display:block}
@@ -266,7 +266,6 @@ button:focus:not(:focus-visible){outline:none}
       <div class="tbtn" data-t="lavoro"><div class="tbi">💼</div><div class="tbl">Lavoro</div></div>
       <div class="tbtn" data-t="ferie"><div class="tbi">☀️</div><div class="tbl">Ferie</div></div>
       <div class="tbtn" data-t="riposo"><div class="tbi">😴</div><div class="tbl">Riposo</div></div>
-      <div class="tbtn" data-t="festivo"><div class="tbi">🎉</div><div class="tbl">Festivo</div></div>
     </div>
     <div class="bpsec" id="bpsec" style="display:none">
       <div class="s-label">Buono pasto (€7,00)</div>
@@ -405,7 +404,7 @@ function closeStatsModal(){document.getElementById('stats-overlay').classList.re
 document.getElementById('stats-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('stats-overlay'))closeStatsModal();});
 function exportCSV(){
   const data=load(),rows=[['Data','Giorno','Tipo','Buoni usati','Accumulato','Valore €']];
-  Object.keys(data).sort().forEach(k=>{if(k==='__banner__')return;const e=data[k];const dt=new Date(k);const dow=dt.getDay();const di=dow===0?6:dow-1;rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);});
+  Object.keys(data).sort().forEach(k=>{if(k==='__banner__')return;const e=data[k];const [ky,kmo,kd]=k.split('-').map(Number);const dt=new Date(ky,kmo-1,kd);const dow=dt.getDay();const di=dow===0?6:dow-1;rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);});
   const csv=rows.map(r=>r.join(';')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
