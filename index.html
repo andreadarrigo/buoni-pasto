@@ -51,19 +51,14 @@
   }
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%;overflow:hidden}
-body{
-  height:100%;overflow:hidden;
-  background:var(--bg);color:var(--text);
-  font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;
-  padding-top:var(--safe-top);
-  position:fixed;width:100%;
-  -webkit-text-size-adjust:100%;text-size-adjust:100%;
-}
+html{height:100%}
+body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;padding-top:var(--safe-top);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body.pwa-mode{height:100%;overflow:hidden;position:fixed;width:100%}
 button,.day,.tbtn,.mb-btn,.s-btn,.mnav-btn{-webkit-user-select:none;user-select:none;touch-action:manipulation}
 button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
 button:focus:not(:focus-visible){outline:none}
-.layout{display:grid;grid-template-columns:1fr;height:100vh;height:-webkit-fill-available;overflow:hidden}
+.layout{display:grid;grid-template-columns:1fr;min-height:100vh}
+.pwa-mode .layout{height:100vh;height:-webkit-fill-available;overflow:hidden}
 @media(min-width:900px){.layout{grid-template-columns:300px 1fr;grid-template-rows:100vh}}
 .sidebar{background:var(--card);border-right:1px solid var(--border);padding:32px 24px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 @media(max-width:899px){.sidebar{display:none}}
@@ -85,7 +80,8 @@ button:focus:not(:focus-visible){outline:none}
 .s-btn:hover{background:var(--bg2)}.s-btn:active{background:var(--bg3)}
 .s-btn.primary{background:var(--sage);color:#fff;border-color:var(--sage)}
 .s-btn.primary:hover{background:#5a8a40}
-.main{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 120px;background:var(--bg);height:100vh;height:-webkit-fill-available}
+.main{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 120px;background:var(--bg)}
+.pwa-mode .main{height:100vh;height:-webkit-fill-available}
 @media(min-width:900px){.main{padding-bottom:32px}}
 .mobile-header{background:var(--card);border-bottom:1px solid var(--border);padding:calc(14px + var(--safe-top)) 18px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 @media(min-width:900px){.mobile-header{display:none}}
@@ -305,6 +301,8 @@ button:focus:not(:focus-visible){outline:none}
   </div>
 </div>
 <script>
+const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+if(isStandalone)document.body.classList.add('pwa-mode');
 const BP=7;
 const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 const DAYS_LONG=['lunedì','martedì','mercoledì','giovedì','venerdì','sabato','domenica'];
@@ -324,7 +322,6 @@ async function initData(){
   renderCal();
   const isAndroid=/android/i.test(navigator.userAgent);
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
   if(!isStandalone&&!localStorage.getItem('bp_banner_closed')){
     const banner=document.getElementById('install-banner');
     const bt=banner.querySelector('.ib-text');
