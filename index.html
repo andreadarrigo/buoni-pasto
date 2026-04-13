@@ -7,476 +7,393 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Buoni Pasto">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#5a8a40">
+<meta name="theme-color" content="#4F46E5">
 <title>Buoni Pasto</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-tailwind.config = {
-  darkMode: 'media',
-  theme: {
-    extend: {
-      colors: {
-        sage: { DEFAULT:'#6C9E4E', 50:'#EAF2E3', 200:'#C8DFB8', 600:'#4E8040' }
-      },
-      fontFamily: {
-        sans: ['"DM Sans"','system-ui','sans-serif'],
-        mono: ['"DM Mono"','monospace']
-      }
-    }
-  }
-}
+tailwind.config={darkMode:'media',theme:{extend:{colors:{brand:{DEFAULT:'#4F46E5',dark:'#3730A3',light:'#EEF2FF'}},fontFamily:{sans:['Inter','system-ui','sans-serif'],mono:['"DM Mono"','monospace']}}}}
 </script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{-webkit-tap-highlight-color:transparent}
 body{-webkit-font-smoothing:antialiased}
 .pt-safe{padding-top:env(safe-area-inset-top,0px)}
 .pb-safe{padding-bottom:env(safe-area-inset-bottom,0px)}
-.t-lavoro{background:#EAF2E3;border-color:#C8DFB8}
-.t-ferie{background:#FDF0E0;border-color:#F5D4A8}
-.t-riposo{background:#EDF1F5;border-color:#C8D4DE}
-.t-festivo{background:#FAEAEA;border-color:#EDBBBB}
+.t-lavoro{border-left:3px solid #4F46E5;background:#EEF2FF}
+.t-ferie{border-left:3px solid #F59E0B;background:#FFFBEB}
+.t-riposo{border-left:3px solid #94A3B8;background:#F8FAFC}
+.t-festivo{border-left:3px solid #EF4444;background:#FEF2F2}
 @media(prefers-color-scheme:dark){
-  .t-lavoro{background:rgba(109,171,79,.16);border-color:rgba(109,171,79,.3)}
-  .t-ferie{background:rgba(212,137,58,.16);border-color:rgba(212,137,58,.3)}
-  .t-riposo{background:rgba(122,140,158,.16);border-color:rgba(122,140,158,.3)}
-  .t-festivo{background:rgba(199,107,107,.16);border-color:rgba(199,107,107,.3)}
+  .t-lavoro{border-left-color:#818CF8;background:rgba(79,70,229,.15)}
+  .t-ferie{border-left-color:#FCD34D;background:rgba(245,158,11,.12)}
+  .t-riposo{border-left-color:#94A3B8;background:rgba(148,163,184,.1)}
+  .t-festivo{border-left-color:#F87171;background:rgba(239,68,68,.1)}
 }
-.overlay{opacity:0;pointer-events:none;transition:opacity .22s}
+.overlay{opacity:0;pointer-events:none;transition:opacity .2s}
 .overlay.open{opacity:1;pointer-events:all}
-.sheet{transform:translateY(48px);transition:transform .25s cubic-bezier(.32,.72,0,1)}
+.sheet{transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
 .overlay.open .sheet{transform:translateY(0)}
-.day-cell:active{transform:scale(.93)}
+@media(min-width:640px){
+  .sheet{border-radius:1.5rem!important;transform:translateY(32px) scale(.97)}
+  .overlay.open .sheet{transform:translateY(0) scale(1)}
+}
+.day-cell:active{transform:scale(.9);transition:transform .1s}
 </style>
 </head>
-<body class="min-h-screen bg-green-50 dark:bg-gray-900 font-sans text-gray-800 dark:text-gray-100">
+<body class="bg-gray-100 dark:bg-gray-950 font-sans text-gray-900 dark:text-gray-100 min-h-screen">
 
-<!-- Layout -->
-<div class="md:grid md:grid-cols-[280px_1fr] md:h-screen">
-
-  <!-- Sidebar desktop -->
-  <aside class="hidden md:flex flex-col gap-6 bg-white dark:bg-gray-800 border-r border-black/5 dark:border-white/5 p-7 overflow-y-auto">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sage to-sage-600 flex items-center justify-center text-xl">🥗</div>
-      <div>
-        <div class="font-bold text-base">Buoni Pasto</div>
-        <div class="text-xs text-gray-400 mt-0.5">€7,00 · Comune di Milano</div>
+<!-- Hero header -->
+<div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900 text-white sticky top-0 z-40">
+  <div class="pt-safe"></div>
+  <div class="max-w-lg mx-auto px-5 pt-4 pb-5">
+    <!-- Top row -->
+    <div class="flex items-center justify-between mb-5">
+      <span class="text-sm font-semibold opacity-60 tracking-wide uppercase">Buoni Pasto</span>
+      <div class="flex gap-2">
+        <button id="prev" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold text-lg active:scale-90 transition-all select-none">‹</button>
+        <button id="next" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold text-lg active:scale-90 transition-all select-none">›</button>
       </div>
     </div>
-    <div>
-      <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-3">Questo mese</div>
-      <div class="flex flex-col gap-2">
-        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3">
-          <span class="text-sm text-gray-500 dark:text-gray-400">💼 Usati lavoro</span>
-          <span class="font-bold font-mono text-sage" id="sd-usati">0</span>
-        </div>
-        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3">
-          <span class="text-sm text-gray-500 dark:text-gray-400">🏖️ Spesi ferie/riposo</span>
-          <span class="font-bold font-mono text-blue-500" id="sd-spesi">0</span>
-        </div>
-        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3">
-          <span class="text-sm text-gray-500 dark:text-gray-400">🟡 Nel pool</span>
-          <span class="font-bold font-mono text-amber-500" id="sd-pool">0</span>
-        </div>
-        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3">
-          <span class="text-sm text-gray-500 dark:text-gray-400">💶 Valore totale</span>
-          <span class="font-bold font-mono text-sage" id="sd-euro">€0</span>
-        </div>
+    <!-- Mese + saldo pool -->
+    <div class="mb-5">
+      <div class="text-base font-medium opacity-70 mb-1" id="mlabel">—</div>
+      <div class="flex items-baseline gap-2">
+        <span class="text-6xl font-extrabold font-mono tracking-tight" id="hero-pool">0</span>
+        <span class="text-lg font-semibold opacity-60">buoni</span>
+      </div>
+      <div class="text-sm opacity-60 mt-1">Pool disponibile · <span class="font-semibold opacity-90" id="hero-pool-euro">€0</span></div>
+    </div>
+    <!-- Stat chips -->
+    <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
+        <div class="text-lg font-bold font-mono" id="m-usati">0</div>
+        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">al lavoro</div>
+      </div>
+      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
+        <div class="text-lg font-bold font-mono" id="m-spesi">0</div>
+        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">in ferie/rip.</div>
+      </div>
+      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
+        <div class="text-lg font-bold font-mono" id="m-acc">0</div>
+        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">accumulati</div>
+      </div>
+      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
+        <div class="text-lg font-bold font-mono" id="m-euro">€0</div>
+        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">valore tot.</div>
       </div>
     </div>
-    <div>
-      <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-3">Legenda</div>
-      <div class="flex flex-col gap-2 text-sm text-gray-500 dark:text-gray-400">
-        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-sage flex-shrink-0"></span>Lavoro</div>
-        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0"></span>Ferie</div>
-        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 flex-shrink-0"></span>Riposo</div>
-        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-400 flex-shrink-0"></span>Festivo</div>
-        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0"></span>Oggi</div>
-      </div>
-    </div>
-    <div class="flex flex-col gap-2 mt-auto">
-      <button onclick="exportCSV()" class="flex items-center gap-2 px-4 py-3 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">📥 Esporta CSV</button>
-      <button onclick="importCSV()" class="flex items-center gap-2 px-4 py-3 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">📂 Importa CSV</button>
-      <button onclick="showStats()" class="flex items-center gap-2 px-4 py-3 rounded-xl bg-sage text-white text-sm font-semibold hover:bg-sage-600 transition-colors">📊 Riepilogo mese</button>
-    </div>
-  </aside>
-
-  <!-- Main -->
-  <main class="md:overflow-y-auto pb-28 md:pb-8 bg-green-50 dark:bg-gray-900">
-
-    <!-- Header mobile -->
-    <header class="md:hidden sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-black/5 dark:border-white/5 px-4 py-3 pt-safe flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sage to-sage-600 flex items-center justify-center">🥗</div>
-        <div>
-          <div class="font-bold text-base leading-tight">Buoni Pasto</div>
-          <div class="text-[10px] text-gray-400">€7,00 · Comune di Milano</div>
-        </div>
-      </div>
-    </header>
-
-    <div class="max-w-2xl mx-auto px-4 py-5 md:px-8 md:py-7">
-
-      <!-- Banner install -->
-      <div id="install-banner" class="hidden mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-2xl px-4 py-3 flex items-start gap-3 text-sm">
-        <div id="banner-text" class="flex-1 leading-relaxed text-gray-600 dark:text-gray-300"></div>
-        <button class="text-gray-400 text-xl leading-none flex-shrink-0" onclick="closeBanner()">×</button>
-      </div>
-
-      <!-- Navigazione mese -->
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-2xl font-bold tracking-tight" id="mlabel"></h2>
-        <div class="flex gap-1.5">
-          <button id="prev" class="w-9 h-9 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors select-none">‹</button>
-          <button id="next" class="w-9 h-9 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors select-none">›</button>
-        </div>
-      </div>
-
-      <!-- Stats mobile -->
-      <div class="md:hidden grid grid-cols-4 gap-1.5 mb-5">
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 text-center border border-black/5 dark:border-white/5">
-          <div class="text-lg font-bold font-mono text-sage" id="m-usati">0</div>
-          <div class="text-[9px] text-gray-400 mt-0.5">lavoro</div>
-        </div>
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 text-center border border-black/5 dark:border-white/5">
-          <div class="text-lg font-bold font-mono text-blue-500" id="m-spesi">0</div>
-          <div class="text-[9px] text-gray-400 mt-0.5">ferie/rip.</div>
-        </div>
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 text-center border border-black/5 dark:border-white/5">
-          <div class="text-lg font-bold font-mono text-amber-500" id="m-pool">0</div>
-          <div class="text-[9px] text-gray-400 mt-0.5">pool</div>
-        </div>
-        <div class="bg-white dark:bg-gray-800 rounded-xl p-2.5 text-center border border-black/5 dark:border-white/5">
-          <div class="text-lg font-bold font-mono text-sage" id="m-euro">€0</div>
-          <div class="text-[9px] text-gray-400 mt-0.5">valore</div>
-        </div>
-      </div>
-
-      <!-- Intestazioni giorni -->
-      <div class="grid grid-cols-7 gap-1 mb-1">
-        <div class="text-[11px] font-semibold text-gray-400 text-center py-1">Lun</div>
-        <div class="text-[11px] font-semibold text-gray-400 text-center py-1">Mar</div>
-        <div class="text-[11px] font-semibold text-gray-400 text-center py-1">Mer</div>
-        <div class="text-[11px] font-semibold text-gray-400 text-center py-1">Gio</div>
-        <div class="text-[11px] font-semibold text-gray-400 text-center py-1">Ven</div>
-        <div class="text-[11px] font-semibold text-rose-400 text-center py-1">Sab</div>
-        <div class="text-[11px] font-semibold text-rose-400 text-center py-1">Dom</div>
-      </div>
-
-      <!-- Griglia calendario -->
-      <div class="grid grid-cols-7 gap-1" id="cal"></div>
-      <p class="hidden text-center text-gray-400 text-sm mt-4" id="empty-hint">Tocca un giorno per impostarlo 👆</p>
-
-    </div>
-  </main>
+  </div>
 </div>
 
-<!-- Bottom bar mobile -->
-<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-black/5 dark:border-white/5 px-4 py-2.5 pb-safe flex gap-2 z-50">
-  <button onclick="exportCSV()" class="flex-1 py-3 rounded-2xl border border-black/10 dark:border-white/10 bg-gray-50 dark:bg-gray-700 text-sm font-medium select-none">📥 Esporta</button>
-  <button onclick="importCSV()" class="flex-1 py-3 rounded-2xl border border-black/10 dark:border-white/10 bg-gray-50 dark:bg-gray-700 text-sm font-medium select-none">📂 Importa</button>
-  <button onclick="showStats()" class="flex-1 py-3 rounded-2xl bg-sage text-white text-sm font-semibold select-none">📊 Riepilogo</button>
+<!-- Calendario -->
+<div class="max-w-lg mx-auto px-3 pt-4 pb-28">
+  <!-- Intestazioni -->
+  <div class="grid grid-cols-7 gap-1 mb-1.5 px-1">
+    <div class="text-[11px] font-semibold text-gray-400 text-center">Lun</div>
+    <div class="text-[11px] font-semibold text-gray-400 text-center">Mar</div>
+    <div class="text-[11px] font-semibold text-gray-400 text-center">Mer</div>
+    <div class="text-[11px] font-semibold text-gray-400 text-center">Gio</div>
+    <div class="text-[11px] font-semibold text-gray-400 text-center">Ven</div>
+    <div class="text-[11px] font-semibold text-red-400 text-center">Sab</div>
+    <div class="text-[11px] font-semibold text-red-400 text-center">Dom</div>
+  </div>
+  <!-- Griglia giorni -->
+  <div class="grid grid-cols-7 gap-1" id="cal"></div>
+  <p class="hidden text-center text-gray-400 text-sm mt-5" id="empty-hint">Tocca un giorno per iniziare 👆</p>
+</div>
+
+<!-- Bottom bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 pb-safe flex gap-2 z-50 shadow-lg">
+  <button onclick="exportCSV()" class="flex-1 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 active:scale-95 transition-transform select-none">📥 Esporta</button>
+  <button onclick="importCSV()" class="flex-1 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 active:scale-95 transition-transform select-none">📂 Importa</button>
+  <button onclick="showStats()" class="flex-1 py-3 rounded-2xl bg-indigo-600 text-white text-sm font-bold active:scale-95 transition-transform select-none shadow-md shadow-indigo-500/30">📊 Riepilogo</button>
 </div>
 
 <!-- Modale giorno -->
-<div class="overlay fixed inset-0 bg-black/45 backdrop-blur-sm flex items-end md:items-center justify-center z-[300]" id="overlay">
-  <div class="sheet bg-white dark:bg-gray-800 w-full max-w-sm rounded-t-3xl md:rounded-3xl border-t border-black/5 dark:border-white/5 max-h-[92vh] overflow-y-auto overscroll-contain pb-safe">
-    <div class="sticky top-0 bg-white dark:bg-gray-800 px-5 pt-4 pb-1 z-10">
-      <div class="w-9 h-1 bg-gray-200 dark:bg-gray-600 rounded-full mx-auto mb-3"></div>
-      <p class="text-xs text-gray-400 text-center" id="m-date"></p>
-      <h3 class="text-lg font-bold text-center mt-0.5 mb-5">Imposta giornata</h3>
+<div class="overlay fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-[200]" id="overlay">
+  <div class="sheet w-full max-w-sm bg-white dark:bg-gray-900 rounded-t-3xl border border-gray-100 dark:border-gray-800 max-h-[90vh] overflow-y-auto overscroll-contain pb-safe">
+    <div class="sticky top-0 bg-white dark:bg-gray-900 px-5 pt-4 z-10">
+      <div class="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
+      <div class="text-xs text-gray-400 text-center" id="m-date"></div>
+      <h3 class="text-xl font-bold text-center mt-1 mb-6">Imposta giornata</h3>
     </div>
     <div class="px-5 pb-6">
-      <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-2.5">Tipo di giornata</p>
-      <div class="grid grid-cols-3 gap-2 mb-5">
-        <button class="tbtn rounded-2xl border-[1.5px] py-3 text-center transition-all active:scale-95 select-none" data-t="lavoro">
-          <span class="text-2xl block mb-1">💼</span>
-          <span class="text-[11px] font-semibold">Lavoro</span>
+      <!-- Tipo -->
+      <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Tipo di giornata</p>
+      <div class="grid grid-cols-3 gap-2 mb-6">
+        <button class="tbtn border-2 rounded-2xl py-4 flex flex-col items-center gap-1.5 transition-all active:scale-95 select-none" data-t="lavoro">
+          <span class="text-2xl">💼</span>
+          <span class="text-xs font-bold">Lavoro</span>
         </button>
-        <button class="tbtn rounded-2xl border-[1.5px] py-3 text-center transition-all active:scale-95 select-none" data-t="ferie">
-          <span class="text-2xl block mb-1">☀️</span>
-          <span class="text-[11px] font-semibold">Ferie</span>
+        <button class="tbtn border-2 rounded-2xl py-4 flex flex-col items-center gap-1.5 transition-all active:scale-95 select-none" data-t="ferie">
+          <span class="text-2xl">☀️</span>
+          <span class="text-xs font-bold">Ferie</span>
         </button>
-        <button class="tbtn rounded-2xl border-[1.5px] py-3 text-center transition-all active:scale-95 select-none" data-t="riposo">
-          <span class="text-2xl block mb-1">😴</span>
-          <span class="text-[11px] font-semibold">Riposo</span>
+        <button class="tbtn border-2 rounded-2xl py-4 flex flex-col items-center gap-1.5 transition-all active:scale-95 select-none" data-t="riposo">
+          <span class="text-2xl">😴</span>
+          <span class="text-xs font-bold">Riposo</span>
         </button>
       </div>
-
-      <!-- Sezione buoni (dinamica) -->
-      <div id="bpsec" class="hidden border-t border-gray-100 dark:border-gray-700 pt-5">
-
-        <!-- Solo lavoro: toggle accumula -->
-        <div id="acc-row" class="hidden mb-3">
-          <button id="acc-card" onclick="toggleAcc()" class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 border-[1.5px] transition-colors select-none text-left">
-            <div>
-              <div class="text-sm font-semibold" id="acc-label">Accumula per dopo</div>
-              <div class="text-xs text-gray-400 mt-0.5">Salva il buono nel pool</div>
+      <!-- Sezione buoni -->
+      <div id="bpsec" class="hidden">
+        <div class="border-t border-gray-100 dark:border-gray-800 pt-5">
+          <!-- Toggle accumula (solo lavoro) -->
+          <div id="acc-row" class="hidden mb-4">
+            <button id="acc-card" onclick="toggleAcc()" class="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-4 border-2 transition-all select-none text-left">
+              <div>
+                <div class="text-sm font-bold" id="acc-label">Accumula per dopo</div>
+                <div class="text-xs text-gray-400 mt-0.5">Salva il buono nel pool</div>
+              </div>
+              <div id="tacc" class="relative w-12 h-7 rounded-full flex-shrink-0 transition-colors duration-200">
+                <div id="tacc-knob" class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform duration-200"></div>
+              </div>
+            </button>
+          </div>
+          <!-- Counter -->
+          <div id="usedrow">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1" id="counter-label">Buoni utilizzati oggi</p>
+            <p class="text-xs mb-4" id="pool-hint"></p>
+            <div class="flex items-center gap-4 bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+              <button id="cminus" class="w-14 h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center text-3xl font-light text-gray-600 dark:text-gray-300 active:scale-90 transition-transform select-none">−</button>
+              <div class="flex-1 text-center">
+                <span class="text-5xl font-extrabold font-mono block" id="ccount">0</span>
+                <span class="text-sm font-semibold text-indigo-500 mt-1 block" id="ceuro"></span>
+              </div>
+              <button id="cplus" class="w-14 h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center text-3xl font-light text-gray-600 dark:text-gray-300 active:scale-90 transition-transform select-none">+</button>
             </div>
-            <div id="tacc" class="relative w-11 h-7 rounded-full flex-shrink-0 transition-colors">
-              <div id="tacc-knob" class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform"></div>
-            </div>
-          </button>
-        </div>
-
-        <!-- Counter buoni -->
-        <div id="usedrow" class="bg-gray-50 dark:bg-gray-700 rounded-2xl border-[1.5px] border-gray-200 dark:border-gray-600 p-4">
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1" id="counter-label">Buoni utilizzati oggi</p>
-          <p class="text-xs text-gray-400 mb-3" id="pool-hint"></p>
-          <div class="flex items-center gap-3">
-            <button id="cminus" class="w-12 h-12 rounded-xl border-[1.5px] border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 flex items-center justify-center text-2xl font-light transition-all active:scale-90 select-none">−</button>
-            <div class="flex-1 text-center">
-              <span class="text-4xl font-bold font-mono block leading-none" id="ccount">0</span>
-              <span class="text-sm font-semibold text-sage mt-1 block" id="ceuro"></span>
-            </div>
-            <button id="cplus" class="w-12 h-12 rounded-xl border-[1.5px] border-gray-200 dark:border-gray-500 bg-white dark:bg-gray-800 flex items-center justify-center text-2xl font-light transition-all active:scale-90 select-none">+</button>
           </div>
         </div>
       </div>
-
-      <button id="savebtn" class="w-full mt-5 py-4 rounded-2xl bg-gradient-to-br from-sage to-sage-600 text-white font-semibold shadow-lg active:opacity-90 select-none">Salva giornata</button>
-      <button id="clearbtn" class="w-full mt-2 py-3.5 rounded-2xl border-[1.5px] border-gray-200 dark:border-gray-600 text-rose-500 font-medium text-sm active:bg-rose-50 select-none">Rimuovi impostazione</button>
+      <button id="savebtn" class="w-full mt-6 py-4 rounded-2xl bg-indigo-600 text-white font-bold text-base shadow-lg shadow-indigo-500/25 active:scale-[.98] transition-transform select-none">Salva giornata</button>
+      <button id="clearbtn" class="w-full mt-2.5 py-3.5 rounded-2xl border-2 border-gray-200 dark:border-gray-700 text-red-500 font-semibold text-sm active:bg-red-50 dark:active:bg-red-900/20 transition-colors select-none">Rimuovi impostazione</button>
     </div>
   </div>
 </div>
 
 <!-- Modale riepilogo -->
-<div class="overlay fixed inset-0 bg-black/45 backdrop-blur-sm flex items-end md:items-center justify-center z-[300]" id="stats-overlay">
-  <div class="sheet bg-white dark:bg-gray-800 w-full max-w-sm rounded-t-3xl md:rounded-3xl border-t border-black/5 dark:border-white/5 max-h-[92vh] overflow-y-auto overscroll-contain pb-safe">
-    <div class="sticky top-0 bg-white dark:bg-gray-800 px-5 pt-4 pb-1 z-10">
-      <div class="w-9 h-1 bg-gray-200 dark:bg-gray-600 rounded-full mx-auto mb-3"></div>
-      <h3 class="text-lg font-bold text-center mb-5" id="stats-title">Riepilogo</h3>
+<div class="overlay fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-[200]" id="stats-overlay">
+  <div class="sheet w-full max-w-sm bg-white dark:bg-gray-900 rounded-t-3xl border border-gray-100 dark:border-gray-800 max-h-[90vh] overflow-y-auto overscroll-contain pb-safe">
+    <div class="sticky top-0 bg-white dark:bg-gray-900 px-5 pt-4 z-10">
+      <div class="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
+      <h3 class="text-xl font-bold text-center mb-6" id="stats-title">Riepilogo</h3>
     </div>
     <div class="px-5 pb-6">
       <div id="stats-body"></div>
-      <button onclick="closeStatsModal()" class="w-full mt-5 py-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold active:opacity-90 select-none">Chiudi</button>
+      <button onclick="closeStatsModal()" class="w-full mt-5 py-4 rounded-2xl bg-indigo-600 text-white font-bold active:scale-[.98] transition-transform select-none">Chiudi</button>
     </div>
   </div>
 </div>
 
 <script>
-const BP = 7;
-const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const DAYS_LONG = ['lunedì','martedì','mercoledì','giovedì','venerdì','sabato','domenica'];
-const TYPE_ICONS = {lavoro:'💼',ferie:'☀️',riposo:'😴',festivo:'🎉'};
-const VALID_TYPES = ['lavoro','ferie','riposo','festivo'];
+const BP=7;
+const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const DAYS_LONG=['lunedì','martedì','mercoledì','giovedì','venerdì','sabato','domenica'];
+const ICONS={lavoro:'💼',ferie:'☀️',riposo:'😴',festivo:'🎉'};
+const VALID=['lavoro','ferie','riposo','festivo'];
+let cy=new Date().getFullYear(),cm=new Date().getMonth();
+let selKey=null,ms={type:null,bp:0,acc:false};
+let _cache={},_db=null;
 
-let cy = new Date().getFullYear(), cm = new Date().getMonth();
-let selKey = null, ms = {type:null, bp:0, acc:false};
-let _cache = {}, _db = null;
+// DB
+function openDB(){return new Promise((res,rej)=>{if(_db){res(_db);return;}const r=indexedDB.open('buonipasto',1);r.onupgradeneeded=e=>e.target.result.createObjectStore('data');r.onsuccess=e=>{_db=e.target.result;res(_db);};r.onerror=()=>rej();});}
+function dbSet(k,v){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').put(v,k).onsuccess=()=>res();tx.onerror=()=>rej();}));}
+function dbDel(k){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').delete(k).onsuccess=()=>res();tx.onerror=()=>rej();}));}
+function dbGetAll(){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('data','readonly'),store=tx.objectStore('data'),keys=[],vals=[];store.openCursor().onsuccess=e=>{const c=e.target.result;if(c){keys.push(c.key);vals.push(c.value);c.continue();}else{const o={};keys.forEach((k,i)=>o[k]=vals[i]);res(o);}};tx.onerror=()=>rej();}));}
+function saveEntry(k,v){_cache[k]=v;dbSet(k,v).catch(()=>{});}
+function deleteEntry(k){delete _cache[k];dbDel(k).catch(()=>{});}
+function sk(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 
-// ── IndexedDB ──────────────────────────────────────────────────────────────
-function openDB() {
-  return new Promise((res,rej) => {
-    if (_db) { res(_db); return; }
-    const req = indexedDB.open('buonipasto',1);
-    req.onupgradeneeded = e => e.target.result.createObjectStore('data');
-    req.onsuccess = e => { _db = e.target.result; res(_db); };
-    req.onerror = () => rej(req.error);
+// Pool globale su tutti i dati
+function getPool(){
+  let acc=0,spent=0;
+  Object.values(_cache).forEach(e=>{
+    if(e.type==='lavoro'&&e.acc) acc++;
+    if((e.type==='ferie'||e.type==='riposo')&&e.bp>0) spent+=e.bp;
   });
-}
-function dbSet(k,v){ return openDB().then(db => new Promise((res,rej) => { const tx=db.transaction('data','readwrite'); tx.objectStore('data').put(v,k).onsuccess=()=>res(); tx.onerror=()=>rej(); })); }
-function dbDel(k){ return openDB().then(db => new Promise((res,rej) => { const tx=db.transaction('data','readwrite'); tx.objectStore('data').delete(k).onsuccess=()=>res(); tx.onerror=()=>rej(); })); }
-function dbGetAll(){ return openDB().then(db => new Promise((res,rej) => { const tx=db.transaction('data','readonly'),store=tx.objectStore('data'),keys=[],vals=[]; store.openCursor().onsuccess=e=>{ const c=e.target.result; if(c){keys.push(c.key);vals.push(c.value);c.continue();}else{const o={};keys.forEach((k,i)=>o[k]=vals[i]);res(o);} }; tx.onerror=()=>rej(); })); }
-function saveEntry(k,v){ _cache[k]=v; dbSet(k,v).catch(()=>{}); }
-function deleteEntry(k){ delete _cache[k]; dbDel(k).catch(()=>{}); }
-function sk(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
-
-// ── Pool globale (tutti i mesi) ────────────────────────────────────────────
-function getPool() {
-  let acc = 0, spentNonWork = 0;
-  Object.values(_cache).forEach(e => {
-    if (e.type==='lavoro' && e.acc) acc++;
-    if ((e.type==='ferie'||e.type==='riposo') && e.bp>0) spentNonWork += e.bp;
-  });
-  return { acc, spentNonWork, available: acc - spentNonWork };
+  return {acc,spent,available:acc-spent};
 }
 
-// ── Calendario ────────────────────────────────────────────────────────────
-function renderCal() {
-  const grid = document.getElementById('cal');
-  grid.innerHTML = '';
-  document.getElementById('mlabel').textContent = MONTHS[cm] + ' ' + cy;
-  const first = new Date(cy,cm,1).getDay(), off = first===0?6:first-1;
-  const dim = new Date(cy,cm+1,0).getDate(), td = new Date();
-  for (let i=0; i<off; i++) grid.appendChild(document.createElement('div'));
-  let hasAny = false;
-  for (let d=1; d<=dim; d++) {
-    const k=sk(cy,cm,d), en=_cache[k]||{type:null,bp:0,acc:false};
-    if (en.type) hasAny = true;
-    const isToday = td.getFullYear()===cy && td.getMonth()===cm && td.getDate()===d;
-    const isWe = [0,6].includes(new Date(cy,cm,d).getDay());
-    const el = document.createElement('div');
-    el.className = [
-      'day-cell rounded-xl border-[1.5px] p-1.5 min-h-[58px] cursor-pointer flex flex-col items-center select-none transition-transform duration-100',
-      en.type ? `t-${en.type}` : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700',
-      isToday ? 'ring-2 ring-blue-400 ring-offset-1' : ''
-    ].join(' ');
-    let badge = '';
-    if (en.type==='lavoro') {
-      if (en.bp>0) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-green-200 dark:bg-green-900/50 text-sage leading-none">${en.bp}×</span>`;
-      else if (en.acc) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-900/50 text-amber-600 leading-none">acc.</span>`;
-    } else if ((en.type==='ferie'||en.type==='riposo') && en.bp>0) {
-      badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-blue-200 dark:bg-blue-900/50 text-blue-600 leading-none">${en.bp}×</span>`;
+// Render calendario
+function renderCal(){
+  const grid=document.getElementById('cal');
+  grid.innerHTML='';
+  document.getElementById('mlabel').textContent=MONTHS[cm]+' '+cy;
+  const first=new Date(cy,cm,1).getDay(),off=first===0?6:first-1;
+  const dim=new Date(cy,cm+1,0).getDate(),td=new Date();
+  for(let i=0;i<off;i++) grid.appendChild(document.createElement('div'));
+  let hasAny=false;
+  for(let d=1;d<=dim;d++){
+    const k=sk(cy,cm,d),en=_cache[k]||{type:null,bp:0,acc:false};
+    if(en.type) hasAny=true;
+    const isToday=td.getFullYear()===cy&&td.getMonth()===cm&&td.getDate()===d;
+    const isWe=[0,6].includes(new Date(cy,cm,d).getDay());
+    const el=document.createElement('div');
+    el.className=[
+      'day-cell rounded-xl border border-gray-200 dark:border-gray-800 p-1.5 cursor-pointer select-none',
+      'min-h-[60px] flex flex-col items-center bg-white dark:bg-gray-900',
+      en.type?`t-${en.type}`:'',
+      isToday?'ring-2 ring-indigo-400 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-950':''
+    ].filter(Boolean).join(' ');
+    let badge='';
+    if(en.type==='lavoro'){
+      if(en.bp>0) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 leading-none">${en.bp}×</span>`;
+      else if(en.acc) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-600 leading-none">acc.</span>`;
+    } else if((en.type==='ferie'||en.type==='riposo')&&en.bp>0){
+      badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-600 leading-none">${en.bp}×</span>`;
     }
-    el.innerHTML = `<span class="text-[11px] font-medium ${isToday?'text-blue-500 font-bold':isWe?'text-rose-400':'text-gray-400'} leading-none">${d}</span><span class="text-base flex-1 flex items-center justify-center">${en.type?TYPE_ICONS[en.type]:''}</span>${badge}`;
-    el.addEventListener('click', () => openModal(d));
+    el.innerHTML=`<span class="text-[11px] font-semibold ${isToday?'text-indigo-500':isWe?'text-red-400':'text-gray-400'} self-start leading-none w-full text-center">${d}</span><span class="text-lg flex-1 flex items-center">${en.type?ICONS[en.type]:''}</span>${badge}`;
+    el.addEventListener('click',()=>openModal(d));
     grid.appendChild(el);
   }
-  const hint = document.getElementById('empty-hint');
-  hint.classList.toggle('hidden', hasAny);
-  hint.classList.toggle('block', !hasAny);
+  document.getElementById('empty-hint').classList.toggle('hidden',hasAny);
+  document.getElementById('empty-hint').classList.toggle('block',!hasAny);
   updateStats();
 }
 
-function updateStats() {
-  const prefix = `${cy}-${String(cm+1).padStart(2,'0')}`;
-  let usati=0, spesi=0;
-  Object.entries(_cache).forEach(([k,e]) => {
-    if (!k.startsWith(prefix)) return;
-    if (e.type==='lavoro' && !e.acc) usati += (e.bp||0);
-    if ((e.type==='ferie'||e.type==='riposo') && e.bp>0) spesi += e.bp;
+function updateStats(){
+  const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
+  let usati=0,spesi=0,accMese=0;
+  Object.entries(_cache).forEach(([k,e])=>{
+    if(!k.startsWith(prefix)) return;
+    if(e.type==='lavoro'&&!e.acc) usati+=(e.bp||0);
+    if(e.type==='lavoro'&&e.acc) accMese++;
+    if((e.type==='ferie'||e.type==='riposo')&&e.bp>0) spesi+=e.bp;
   });
-  const pool = getPool();
-  ['m-usati','sd-usati'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=usati; });
-  ['m-spesi','sd-spesi'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=spesi; });
-  ['m-pool','sd-pool'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=pool.available; });
-  ['m-euro','sd-euro'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='€'+((usati+spesi)*BP); });
+  const pool=getPool();
+  const heroPool=Math.max(0,pool.available);
+  document.getElementById('hero-pool').textContent=heroPool;
+  document.getElementById('hero-pool').style.color=pool.available<0?'#FCA5A5':'';
+  document.getElementById('hero-pool-euro').textContent='€'+(heroPool*BP);
+  document.getElementById('m-usati').textContent=usati;
+  document.getElementById('m-spesi').textContent=spesi;
+  document.getElementById('m-acc').textContent=accMese;
+  document.getElementById('m-euro').textContent='€'+((usati+spesi)*BP);
 }
 
-// ── Modale giorno ─────────────────────────────────────────────────────────
-function openModal(d) {
-  selKey = sk(cy,cm,d);
-  const en = _cache[selKey]||{type:null,bp:0,acc:false};
-  ms = {type:en.type, bp:en.bp||0, acc:en.acc||false};
-  const dow = new Date(cy,cm,d).getDay(), di = dow===0?6:dow-1;
-  document.getElementById('m-date').textContent = DAYS_LONG[di]+' '+d+' '+MONTHS[cm]+' '+cy;
+// Modale
+function openModal(d){
+  selKey=sk(cy,cm,d);
+  const en=_cache[selKey]||{type:null,bp:0,acc:false};
+  ms={type:en.type,bp:en.bp||0,acc:en.acc||false};
+  const dow=new Date(cy,cm,d).getDay(),di=dow===0?6:dow-1;
+  document.getElementById('m-date').textContent=DAYS_LONG[di]+' '+d+' '+MONTHS[cm]+' '+cy;
   renderMs();
   document.getElementById('overlay').classList.add('open');
 }
 
-function renderMs() {
-  const pool = getPool();
+function renderMs(){
+  const pool=getPool();
   // Pulsanti tipo
-  const colors = {
-    lavoro:  {bg:'bg-green-100 dark:bg-green-900/30', border:'border-sage', text:'text-sage'},
-    ferie:   {bg:'bg-amber-50 dark:bg-amber-900/30', border:'border-amber-400', text:'text-amber-600'},
-    riposo:  {bg:'bg-slate-100 dark:bg-slate-700/50', border:'border-slate-400', text:'text-slate-500'},
+  const C={
+    lavoro:{bg:'bg-indigo-50 dark:bg-indigo-900/30',border:'border-indigo-500',txt:'text-indigo-600'},
+    ferie: {bg:'bg-amber-50 dark:bg-amber-900/30',border:'border-amber-400',txt:'text-amber-600'},
+    riposo:{bg:'bg-slate-100 dark:bg-slate-800',border:'border-slate-400',txt:'text-slate-500'},
   };
-  document.querySelectorAll('.tbtn').forEach(b => {
-    const t = b.dataset.t, active = ms.type===t;
-    b.className = `tbtn rounded-2xl border-[1.5px] py-3 text-center transition-all active:scale-95 select-none ${active?(colors[t].bg+' '+colors[t].border):'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600'}`;
-    b.querySelector('span:last-child').className = `text-[11px] font-semibold ${active?colors[t].text:'text-gray-500 dark:text-gray-400'}`;
+  document.querySelectorAll('.tbtn').forEach(b=>{
+    const t=b.dataset.t,a=ms.type===t;
+    b.className=`tbtn border-2 rounded-2xl py-4 flex flex-col items-center gap-1.5 transition-all active:scale-95 select-none ${a?C[t].bg+' '+C[t].border:'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`;
+    b.querySelector('span:last-child').className=`text-xs font-bold ${a?C[t].txt:'text-gray-500 dark:text-gray-400'}`;
   });
-
-  const hasVoucher = ms.type==='lavoro'||ms.type==='ferie'||ms.type==='riposo';
-  document.getElementById('bpsec').classList.toggle('hidden', !hasVoucher);
-
-  if (hasVoucher) {
-    const isLavoro = ms.type==='lavoro';
-    // Riga accumula (solo lavoro)
-    const accRow = document.getElementById('acc-row');
-    accRow.classList.toggle('hidden', !isLavoro);
-    if (isLavoro) {
-      const accCard = document.getElementById('acc-card');
-      accCard.className = `w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 border-[1.5px] transition-colors select-none text-left ${ms.acc?'bg-amber-50 dark:bg-amber-900/20 border-amber-400':'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'}`;
-      document.getElementById('acc-label').className = `text-sm font-semibold ${ms.acc?'text-amber-600':'text-gray-700 dark:text-gray-200'}`;
-      const tacc = document.getElementById('tacc');
-      tacc.className = `relative w-11 h-7 rounded-full flex-shrink-0 transition-colors ${ms.acc?'bg-amber-400':'bg-gray-300 dark:bg-gray-500'}`;
-      document.getElementById('tacc-knob').className = `absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${ms.acc?'translate-x-4':''}`;
-    }
-
-    // Counter visibile se: non lavoro, oppure lavoro senza accumulo
-    const showCounter = !isLavoro || !ms.acc;
-    document.getElementById('usedrow').classList.toggle('hidden', !showCounter);
-    if (showCounter) {
-      document.getElementById('counter-label').textContent = isLavoro ? 'Buoni utilizzati oggi' : 'Buoni spesi dal pool';
-      // Hint pool per ferie/riposo
-      const hint = document.getElementById('pool-hint');
-      if (!isLavoro) {
-        hint.textContent = `Pool disponibile: ${pool.available} buon${pool.available===1?'o':'i'}`;
-        hint.className = 'text-xs mb-3 ' + (pool.available>0?'text-amber-500':'text-rose-400');
-      } else {
-        hint.textContent = '';
-      }
-      document.getElementById('ccount').textContent = ms.bp;
-      document.getElementById('ceuro').textContent = ms.bp>0 ? '€'+(ms.bp*BP) : '';
-    }
+  const has=ms.type==='lavoro'||ms.type==='ferie'||ms.type==='riposo';
+  document.getElementById('bpsec').classList.toggle('hidden',!has);
+  if(!has) return;
+  const isLav=ms.type==='lavoro';
+  // Accumula row
+  const ar=document.getElementById('acc-row');
+  ar.classList.toggle('hidden',!isLav);
+  if(isLav){
+    const ac=document.getElementById('acc-card');
+    ac.className=`w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-4 border-2 transition-all select-none text-left ${ms.acc?'bg-amber-50 dark:bg-amber-900/20 border-amber-400':'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`;
+    document.getElementById('acc-label').className=`text-sm font-bold ${ms.acc?'text-amber-600':'text-gray-800 dark:text-gray-100'}`;
+    document.getElementById('tacc').className=`relative w-12 h-7 rounded-full flex-shrink-0 transition-colors duration-200 ${ms.acc?'bg-amber-400':'bg-gray-300 dark:bg-gray-600'}`;
+    document.getElementById('tacc-knob').className=`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform duration-200 ${ms.acc?'translate-x-5':''}`;
+  }
+  // Counter
+  const showC=!isLav||!ms.acc;
+  document.getElementById('usedrow').classList.toggle('hidden',!showC);
+  if(showC){
+    document.getElementById('counter-label').textContent=isLav?'Buoni utilizzati oggi':'Buoni spesi dal pool';
+    const hint=document.getElementById('pool-hint');
+    if(!isLav){
+      const av=pool.available;
+      hint.textContent=`Pool disponibile: ${av} buon${av===1?'o':'i'}`;
+      hint.className='text-xs mb-4 font-medium '+(av>0?'text-amber-500':'text-red-400');
+    } else { hint.textContent=''; hint.className=''; }
+    document.getElementById('ccount').textContent=ms.bp;
+    document.getElementById('ceuro').textContent=ms.bp>0?'€'+(ms.bp*BP):'';
   }
 }
 
-function toggleAcc() { ms.acc=!ms.acc; if(ms.acc) ms.bp=0; renderMs(); }
-function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-function closeStatsModal() { document.getElementById('stats-overlay').classList.remove('open'); }
+function toggleAcc(){ms.acc=!ms.acc;if(ms.acc)ms.bp=0;renderMs();}
+function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function closeStatsModal(){document.getElementById('stats-overlay').classList.remove('open');}
 
-// ── Event listeners ────────────────────────────────────────────────────────
-document.querySelectorAll('.tbtn').forEach(b => {
-  b.addEventListener('click', () => { ms.type=b.dataset.t; if(ms.type!=='lavoro'){ms.acc=false;} renderMs(); });
-});
-document.getElementById('cplus').addEventListener('click', () => { ms.bp++; renderMs(); });
-document.getElementById('cminus').addEventListener('click', () => { if(ms.bp>0) ms.bp--; renderMs(); });
-document.getElementById('savebtn').addEventListener('click', () => { if(ms.type) saveEntry(selKey,{type:ms.type,bp:ms.bp,acc:ms.acc}); closeModal(); renderCal(); });
-document.getElementById('clearbtn').addEventListener('click', () => { deleteEntry(selKey); closeModal(); renderCal(); });
-document.getElementById('overlay').addEventListener('click', e => { if(e.target===document.getElementById('overlay')) closeModal(); });
-document.getElementById('stats-overlay').addEventListener('click', e => { if(e.target===document.getElementById('stats-overlay')) closeStatsModal(); });
-document.getElementById('prev').addEventListener('click', () => { cm--; if(cm<0){cm=11;cy--;} renderCal(); });
-document.getElementById('next').addEventListener('click', () => { cm++; if(cm>11){cm=0;cy++;} renderCal(); });
+document.querySelectorAll('.tbtn').forEach(b=>b.addEventListener('click',()=>{ms.type=b.dataset.t;if(ms.type!=='lavoro')ms.acc=false;renderMs();}));
+document.getElementById('cplus').addEventListener('click',()=>{ms.bp++;renderMs();});
+document.getElementById('cminus').addEventListener('click',()=>{if(ms.bp>0)ms.bp--;renderMs();});
+document.getElementById('savebtn').addEventListener('click',()=>{if(ms.type)saveEntry(selKey,{type:ms.type,bp:ms.bp,acc:ms.acc});closeModal();renderCal();});
+document.getElementById('clearbtn').addEventListener('click',()=>{deleteEntry(selKey);closeModal();renderCal();});
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===document.getElementById('overlay'))closeModal();});
+document.getElementById('stats-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('stats-overlay'))closeStatsModal();});
+document.getElementById('prev').addEventListener('click',()=>{cm--;if(cm<0){cm=11;cy--;}renderCal();});
+document.getElementById('next').addEventListener('click',()=>{cm++;if(cm>11){cm=0;cy++;}renderCal();});
 
-// ── Riepilogo ──────────────────────────────────────────────────────────────
-function showStats() {
-  const prefix = `${cy}-${String(cm+1).padStart(2,'0')}`;
-  let lav=0, fer=0, rip=0, fes=0, usati=0, spesi=0;
-  Object.entries(_cache).forEach(([k,e]) => {
-    if (!k.startsWith(prefix)) return;
-    if (e.type==='lavoro'){lav++; if(!e.acc) usati+=(e.bp||0);}
-    if (e.type==='ferie'){fer++; if(e.bp>0) spesi+=e.bp;}
-    if (e.type==='riposo'){rip++; if(e.bp>0) spesi+=e.bp;}
-    if (e.type==='festivo') fes++;
+// Riepilogo
+function showStats(){
+  const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
+  let lav=0,fer=0,rip=0,fes=0,usati=0,spesi=0,accM=0;
+  Object.entries(_cache).forEach(([k,e])=>{
+    if(!k.startsWith(prefix)) return;
+    if(e.type==='lavoro'){lav++;if(!e.acc)usati+=(e.bp||0);if(e.acc)accM++;}
+    if(e.type==='ferie'){fer++;if(e.bp>0)spesi+=e.bp;}
+    if(e.type==='riposo'){rip++;if(e.bp>0)spesi+=e.bp;}
+    if(e.type==='festivo') fes++;
   });
-  const pool = getPool();
-  document.getElementById('stats-title').textContent = `Riepilogo — ${MONTHS[cm]} ${cy}`;
-  document.getElementById('stats-body').innerHTML = `
-    <div class="grid grid-cols-2 gap-3 mb-4">
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4"><div class="text-xl mb-1">💼</div><div class="text-2xl font-bold font-mono text-sage">${usati}</div><div class="text-xs text-gray-400 mt-1">Usati al lavoro · €${usati*BP}</div></div>
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4"><div class="text-xl mb-1">🏖️</div><div class="text-2xl font-bold font-mono text-blue-500">${spesi}</div><div class="text-xs text-gray-400 mt-1">Spesi in ferie/riposo · €${spesi*BP}</div></div>
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4"><div class="text-xl mb-1">🟡</div><div class="text-2xl font-bold font-mono text-amber-500">${pool.available}</div><div class="text-xs text-gray-400 mt-1">Pool disponibile (globale)</div></div>
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4"><div class="text-xl mb-1">💶</div><div class="text-2xl font-bold font-mono text-sage">€${(usati+spesi)*BP}</div><div class="text-xs text-gray-400 mt-1">Valore totale usato</div></div>
+  const pool=getPool();
+  document.getElementById('stats-title').textContent=`${MONTHS[cm]} ${cy}`;
+  document.getElementById('stats-body').innerHTML=`
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-4"><div class="text-2xl mb-2">🟣</div><div class="text-3xl font-extrabold font-mono text-indigo-600">${pool.available}</div><div class="text-xs text-gray-400 mt-1">Pool disponibile</div></div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4"><div class="text-2xl mb-2">💶</div><div class="text-3xl font-extrabold font-mono">${(usati+spesi)*BP}€</div><div class="text-xs text-gray-400 mt-1">Valore totale usato</div></div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4"><div class="text-2xl mb-2">💼</div><div class="text-3xl font-extrabold font-mono">${usati}</div><div class="text-xs text-gray-400 mt-1">Usati al lavoro</div></div>
+      <div class="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4"><div class="text-2xl mb-2">🏖️</div><div class="text-3xl font-extrabold font-mono text-amber-600">${spesi}</div><div class="text-xs text-gray-400 mt-1">Spesi in ferie/rip.</div></div>
     </div>
-    <div class="divide-y divide-gray-100 dark:divide-gray-700">
-      <div class="flex justify-between py-3"><span class="text-sm text-gray-500">💼 Giorni lavorativi</span><span class="font-bold font-mono">${lav}</span></div>
-      <div class="flex justify-between py-3"><span class="text-sm text-gray-500">☀️ Ferie</span><span class="font-bold font-mono">${fer}</span></div>
-      <div class="flex justify-between py-3"><span class="text-sm text-gray-500">😴 Riposo</span><span class="font-bold font-mono">${rip}</span></div>
-      <div class="flex justify-between py-3"><span class="text-sm text-gray-500">🎉 Festivi</span><span class="font-bold font-mono">${fes}</span></div>
-      <div class="flex justify-between py-3"><span class="text-sm text-gray-500">📅 Giorni totali</span><span class="font-bold font-mono">${lav+fer+rip+fes}</span></div>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden">
+      <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">💼 Giorni lavorativi</span><span class="font-bold font-mono">${lav}</span></div>
+      <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">☀️ Ferie</span><span class="font-bold font-mono">${fer}</span></div>
+      <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">😴 Riposo</span><span class="font-bold font-mono">${rip}</span></div>
+      <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">🎉 Festivi</span><span class="font-bold font-mono">${fes}</span></div>
+      <div class="flex justify-between items-center px-4 py-3"><span class="text-sm text-gray-500 font-semibold">📅 Totale giorni</span><span class="font-bold font-mono">${lav+fer+rip+fes}</span></div>
     </div>`;
   document.getElementById('stats-overlay').classList.add('open');
 }
 
-// ── CSV ────────────────────────────────────────────────────────────────────
-function exportCSV() {
-  const rows = [['Data','Giorno','Tipo','Buoni usati','Accumulato','Valore €']];
-  Object.keys(_cache).sort().forEach(k => {
-    const e=_cache[k], [ky,kmo,kd]=k.split('-').map(Number);
+// CSV
+function exportCSV(){
+  const rows=[['Data','Giorno','Tipo','Buoni usati','Accumulato','Valore €']];
+  Object.keys(_cache).sort().forEach(k=>{
+    const e=_cache[k],[ky,kmo,kd]=k.split('-').map(Number);
     const di=((new Date(ky,kmo-1,kd).getDay())||7)-1;
     rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);
   });
-  const blob=new Blob(['\uFEFF'+rows.map(r=>r.join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='buoni_pasto.csv'; a.click();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+rows.map(r=>r.join(';')).join('\n')],{type:'text/csv;charset=utf-8'}));
+  a.download='buoni_pasto.csv';a.click();
 }
-function importCSV() {
-  const input=document.createElement('input'); input.type='file'; input.accept='.csv';
+function importCSV(){
+  const input=document.createElement('input');input.type='file';input.accept='.csv';
   input.onchange=e=>{
-    const file=e.target.files[0]; if(!file) return;
+    const file=e.target.files[0];if(!file)return;
     const reader=new FileReader();
     reader.onload=ev=>{
       const lines=ev.target.result.replace(/^\uFEFF/,'').split('\n').filter(l=>l.trim());
-      if(lines.length<2) return;
-      let imported=0; const promises=[];
+      if(lines.length<2)return;
+      let imported=0;const promises=[];
       for(let i=1;i<lines.length;i++){
-        const cols=lines[i].split(';'); if(cols.length<5) continue;
+        const cols=lines[i].split(';');if(cols.length<5)continue;
         const key=cols[0].trim(),type=cols[2].trim(),bp=parseInt(cols[3])||0,acc=cols[4].trim()==='Sì';
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(key)||!VALID_TYPES.includes(type)) continue;
-        const entry={type,bp,acc}; _cache[key]=entry; promises.push(dbSet(key,entry)); imported++;
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(key)||!VALID.includes(type))continue;
+        const entry={type,bp,acc};_cache[key]=entry;promises.push(dbSet(key,entry));imported++;
       }
       Promise.all(promises).then(()=>{renderCal();alert(`Importati ${imported} giorni.`);}).catch(()=>{renderCal();alert(`Importati ${imported} giorni.`);});
     };
@@ -485,30 +402,16 @@ function importCSV() {
   input.click();
 }
 
-// ── Banner install ─────────────────────────────────────────────────────────
-function closeBanner() { document.getElementById('install-banner').classList.add('hidden'); localStorage.setItem('bp_banner_closed','1'); }
-
-// ── Service Worker ─────────────────────────────────────────────────────────
-const isStandalone = window.navigator.standalone||window.matchMedia('(display-mode:standalone)').matches;
-if ('serviceWorker' in navigator) {
-  const sw=`const C='bp-v5';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
+// Service Worker
+if('serviceWorker' in navigator){
+  const sw=`const C='bp-v6';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
 }
 document.addEventListener('touchmove',function(e){let el=e.target;while(el&&el!==document.body){const s=window.getComputedStyle(el);if((s.overflow+s.overflowY).match(/auto|scroll/))return;el=el.parentElement;}e.preventDefault();},{passive:false});
 
-// ── Init ───────────────────────────────────────────────────────────────────
-async function initData() {
-  try { _cache=await dbGetAll(); } catch(_) { try{_cache=JSON.parse(localStorage.getItem('bp_data')||'{}');}catch(e){} }
+async function initData(){
+  try{_cache=await dbGetAll();}catch(_){try{_cache=JSON.parse(localStorage.getItem('bp_data')||'{}');}catch(e){}}
   renderCal();
-  if (!isStandalone && !localStorage.getItem('bp_banner_closed')) {
-    const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent), isAndroid=/android/i.test(navigator.userAgent);
-    const bt=document.getElementById('banner-text');
-    if(isIOS) bt.innerHTML='<strong>Installa come app:</strong> tocca <strong>⬆ Condividi</strong> in Safari → <strong>"Aggiungi alla schermata Home"</strong>.';
-    else if(isAndroid) bt.innerHTML='<strong>Installa come app:</strong> tocca <strong>⋮</strong> in Chrome → <strong>"Aggiungi a schermata Home"</strong>.';
-    else bt.innerHTML='<strong>Installa come app:</strong> usa il pulsante di installazione nella barra del browser.';
-    const banner=document.getElementById('install-banner');
-    banner.classList.remove('hidden'); banner.classList.add('flex');
-  }
 }
 initData();
 </script>
