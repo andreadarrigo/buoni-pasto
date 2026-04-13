@@ -111,6 +111,11 @@ body{-webkit-font-smoothing:antialiased}
   </div>
 </div>
 
+<!-- Banner scadenza buoni -->
+<div class="max-w-lg mx-auto px-3 pt-3">
+  <div id="exp-banner" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 rounded-2xl px-4 py-2.5 text-sm"></div>
+</div>
+
 <!-- Calendario -->
 <div class="max-w-lg mx-auto px-3 pt-4 pb-28">
   <!-- Intestazioni -->
@@ -229,14 +234,43 @@ function saveEntry(k,v){_cache[k]=v;dbSet(k,v).catch(()=>{});}
 function deleteEntry(k){delete _cache[k];dbDel(k).catch(()=>{});}
 function sk(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 
-// Pool globale su tutti i dati
-function getPool(){
-  let acc=0,spent=0;
-  Object.values(_cache).forEach(e=>{
-    if(e.type==='lavoro'&&e.acc) acc++;
-    if((e.type==='ferie'||e.type==='riposo')&&e.bp>0) spent+=e.bp;
+// Calcolo saldo cumulativo con regola di scadenza e consumo FIFO
+// Regola: buoni maturati gen-ott scadono 31/12 stesso anno
+//         buoni maturati nov-dic scadono 31/12 anno successivo
+function calcSaldo(){
+  const today=new Date();
+
+  // Raggruppa buoni maturati per anno di scadenza
+  const groups={}; // { expiryYear: count }
+  Object.entries(_cache).forEach(([k,e])=>{
+    if(e.type!=='lavoro') return;
+    const [ky,km]=k.split('-').map(Number); // km = mese 1-based
+    const expYear=km<=10?ky:ky+1;
+    groups[expYear]=(groups[expYear]||0)+1;
   });
-  return {acc,spent,available:acc-spent};
+
+  // Totale buoni spesi su TUTTA la storia
+  let spent=Object.values(_cache).reduce((s,e)=>s+(e.bp||0),0);
+
+  // FIFO: consuma prima dal gruppo con scadenza più vicina
+  const result={available:0, groups:[]};
+  const years=Object.keys(groups).map(Number).sort();
+
+  for(const year of years){
+    const earned=groups[year];
+    const expDate=new Date(year,11,31,23,59,59); // 31 dic ore 23:59
+    const isExpired=today>expDate;
+
+    const consumed=Math.min(spent,earned);
+    spent-=consumed;
+    const leftover=earned-consumed;
+
+    if(!isExpired && leftover>0){
+      result.available+=leftover;
+      result.groups.push({year,count:leftover,date:`31/12/${year}`});
+    }
+  }
+  return result;
 }
 
 // Render calendario
@@ -278,57 +312,66 @@ function renderCal(){
 
 function updateStats(){
   const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
-  // A: maturati = tutti i giorni lavoro del mese (1 per giorno)
-  let maturati=0;
-  // C: usati = somma di tutti i bp su qualsiasi giornata del mese
-  let usati=0;
+  // Mensile: maturati e usati del mese corrente
+  let maturati=0, usati=0;
   Object.entries(_cache).forEach(([k,e])=>{
     if(!k.startsWith(prefix)) return;
     if(e.type==='lavoro') maturati++;
     usati+=(e.bp||0);
   });
-  // D: saldo = maturati − usati (può essere negativo)
-  const saldo=maturati-usati;
-  // B: euro
   const euroMaturati=maturati*BP;
   const euroSpesi=usati*BP;
 
-  // Saldo
+  // Cumulativo: saldo con regola scadenza FIFO
+  const saldoData=calcSaldo();
+  const saldo=saldoData.available;
+  const euroSaldo=saldo*BP;
+
+  // Card saldo buoni (cumulativo)
   const saldoEl=document.getElementById('hero-saldo');
   saldoEl.textContent=(saldo>0?'+':'')+saldo;
-  // Card saldo: verde se positivo/zero, rosso se negativo
   const saldoCard=document.getElementById('saldo-card');
-  if(saldo<0){
-    saldoCard.className='rounded-2xl px-3 py-2.5 bg-red-500/40';
-    saldoEl.style.color='#FEE2E2';
-  } else {
-    saldoCard.className='rounded-2xl px-3 py-2.5 bg-green-500/30';
-    saldoEl.style.color='';
+  if(saldoCard){
+    saldoCard.className=`rounded-2xl px-2.5 py-2.5 ${saldo<0?'bg-red-500/40':'bg-green-500/30'}`;
+    saldoEl.style.color=saldo<0?'#FEE2E2':'';
   }
 
-  // Euro saldo
-  const euroSaldo=euroMaturati-euroSpesi;
+  // Card euro saldo (cumulativo)
+  const euroSaldoCard=document.getElementById('euro-saldo-card');
+  const euroSaldoEl=document.getElementById('stat-euro-saldo');
+  if(euroSaldoCard&&euroSaldoEl){
+    euroSaldoCard.className=`rounded-2xl px-2.5 py-2.5 ${euroSaldo<0?'bg-red-500/40':'bg-green-500/30'}`;
+    euroSaldoEl.textContent=(euroSaldo>0?'+':'')+'€'+euroSaldo;
+    euroSaldoEl.style.color=euroSaldo<0?'#FEE2E2':'';
+  }
 
-  // Aggiorna tutte le card
+  // Aggiorna card mensili
   const ids={
     'stat-maturati': maturati,
     'stat-usati': usati,
     'stat-euro-maturati': '€'+euroMaturati,
-    'stat-euro-spesi': '€'+euroSpesi,
-    'stat-euro-saldo': (euroSaldo>0?'+':'')+'€'+euroSaldo
+    'stat-euro-spesi': '€'+euroSpesi
   };
   Object.entries(ids).forEach(([id,val])=>{
     const el=document.getElementById(id);
     if(el) el.textContent=val;
   });
 
-  // Colora card euro saldo (stesso schema del saldo buoni)
-  const euroSaldoCard=document.getElementById('euro-saldo-card');
-  if(euroSaldoCard){
-    euroSaldoCard.className=`rounded-2xl px-2.5 py-2.5 ${euroSaldo<0?'bg-red-500/40':'bg-green-500/30'}`;
-    const el=document.getElementById('stat-euro-saldo');
-    if(el) el.style.color=euroSaldo<0?'#FEE2E2':'';
+  // Banner scadenza: mostra avviso se ci sono buoni in scadenza entro l'anno corrente
+  const expBanner=document.getElementById('exp-banner');
+  if(expBanner){
+    const today=new Date();
+    const thisYear=today.getFullYear();
+    const expiringThisYear=saldoData.groups.filter(g=>g.year===thisYear);
+    if(expiringThisYear.length>0){
+      const tot=expiringThisYear.reduce((s,g)=>s+g.count,0);
+      expBanner.innerHTML=`⚠️ <strong>${tot} buon${tot===1?'o':'i'}</strong> scadon${tot===1?'e':'o'} il <strong>31/12/${thisYear}</strong> — usali entro l'anno!`;
+      expBanner.classList.remove('hidden');
+    } else {
+      expBanner.classList.add('hidden');
+    }
   }
+
 }
 
 // Modale
@@ -411,8 +454,9 @@ function showStats(){
     if(e.type==='festivo') fes++;
     usati+=(e.bp||0);
   });
+  const saldoData=calcSaldo();
   const maturati=lav;
-  const saldo=maturati-usati;
+  const saldo=saldoData.available;
   document.getElementById('stats-title').textContent=`${MONTHS[cm]} ${cy}`;
   document.getElementById('stats-body').innerHTML=`
     <div class="grid grid-cols-2 gap-3 mb-4">
@@ -448,7 +492,18 @@ function showStats(){
       <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">😴 Riposo</span><span class="font-bold font-mono">${rip}</span></div>
       <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">🎉 Festivi</span><span class="font-bold font-mono">${fes}</span></div>
       <div class="flex justify-between items-center px-4 py-3"><span class="text-sm text-gray-500 font-semibold">📅 Totale giorni</span><span class="font-bold font-mono">${lav+fer+rip+fes}</span></div>
-    </div>`;
+    </div>
+    ${saldoData.groups.length>0?`
+    <div class="mt-4">
+      <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Scadenze buoni</p>
+      <div class="flex flex-col gap-2">
+        ${saldoData.groups.map(g=>`
+        <div class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3">
+          <span class="text-sm text-amber-700 dark:text-amber-300">⏳ Scadono il ${g.date}</span>
+          <span class="font-bold font-mono text-amber-700 dark:text-amber-300">${g.count} buon${g.count===1?'o':'i'} · €${g.count*BP}</span>
+        </div>`).join('')}
+      </div>
+    </div>`:''}`;
   document.getElementById('stats-overlay').classList.add('open');
 }
 
