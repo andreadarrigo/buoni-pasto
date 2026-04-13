@@ -143,7 +143,7 @@ body{-webkit-font-smoothing:antialiased}
 </div>
 
 <!-- Modale giorno -->
-<div class="overlay fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-[200]" id="overlay">
+<div class="overlay fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[200]" id="overlay">
   <div class="sheet w-full max-w-sm bg-white dark:bg-gray-900 rounded-t-3xl border border-gray-100 dark:border-gray-800 max-h-[90vh] overflow-y-auto overscroll-contain pb-safe">
     <div class="sticky top-0 bg-white dark:bg-gray-900 px-5 pt-4 z-10">
       <div class="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
@@ -204,7 +204,7 @@ body{-webkit-font-smoothing:antialiased}
 </div>
 
 <!-- Modale riepilogo -->
-<div class="overlay fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center z-[200]" id="stats-overlay">
+<div class="overlay fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[200]" id="stats-overlay">
   <div class="sheet w-full max-w-sm bg-white dark:bg-gray-900 rounded-t-3xl border border-gray-100 dark:border-gray-800 max-h-[90vh] overflow-y-auto overscroll-contain pb-safe">
     <div class="sticky top-0 bg-white dark:bg-gray-900 px-5 pt-4 z-10">
       <div class="w-10 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
@@ -313,13 +313,14 @@ function renderCal(){
 }
 
 function setEl(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
-function colorCard(cardId,valId,val,pos,neg){
+function colorCard(cardId,valId,val){
   const card=document.getElementById(cardId);
   const el=document.getElementById(valId);
   if(!card||!el) return;
-  card.className=card.className.replace(/bg-\S+/g,'').trim()+' '+(val<0?neg:pos);
+  card.style.background=val<0?'rgba(239,68,68,0.35)':'rgba(34,197,94,0.25)';
   el.style.color=val<0?'#FEE2E2':'';
 }
+function getPool(){ return calcSaldo(); }
 
 function updateStats(){
   // ── Mensile ──────────────────────────────────────────────
@@ -341,8 +342,8 @@ function updateStats(){
   setEl('stat-euro-spesi', '€'+euroSpesi);
   setEl('stat-saldo-mese', (saldoMese>0?'+':'')+saldoMese);
   setEl('stat-euro-saldo-mese', (euroSaldoMese>0?'+':'')+'€'+euroSaldoMese);
-  colorCard('saldo-mese-card','stat-saldo-mese',saldoMese,'bg-green-500/25','bg-red-500/35');
-  colorCard('euro-saldo-mese-card','stat-euro-saldo-mese',euroSaldoMese,'bg-green-500/20','bg-red-500/30');
+  colorCard('saldo-mese-card','stat-saldo-mese',saldoMese);
+  colorCard('euro-saldo-mese-card','stat-euro-saldo-mese',euroSaldoMese);
 
   // ── Generale cumulativo (con scadenze FIFO) ───────────────
   const saldoData=calcSaldo();
@@ -351,8 +352,8 @@ function updateStats(){
 
   setEl('stat-saldo-gen', (saldoGen>0?'+':'')+saldoGen);
   setEl('stat-euro-saldo-gen', (euroSaldoGen>0?'+':'')+'€'+euroSaldoGen);
-  colorCard('saldo-gen-card','stat-saldo-gen',saldoGen,'bg-green-500/30','bg-red-500/40');
-  colorCard('euro-saldo-gen-card','stat-euro-saldo-gen',euroSaldoGen,'bg-green-500/25','bg-red-500/35');
+  colorCard('saldo-gen-card','stat-saldo-gen',saldoGen);
+  colorCard('euro-saldo-gen-card','stat-euro-saldo-gen',euroSaldoGen);
 
   // ── Banner scadenza ───────────────────────────────────────
   const expBanner=document.getElementById('exp-banner');
@@ -441,64 +442,87 @@ document.getElementById('next').addEventListener('click',()=>{cm++;if(cm>11){cm=
 // Riepilogo
 function showStats(){
   const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
-  let lav=0,fer=0,rip=0,fes=0,usati=0;
+  let lav=0,fer=0,rip=0,usati=0;
   Object.entries(_cache).forEach(([k,e])=>{
     if(!k.startsWith(prefix)) return;
     if(e.type==='lavoro') lav++;
     if(e.type==='ferie') fer++;
     if(e.type==='riposo') rip++;
-    if(e.type==='festivo') fes++;
     usati+=(e.bp||0);
   });
-  const saldoData=calcSaldo();
   const maturati=lav;
-  const saldo=saldoData.available;
+  const saldoMese=maturati-usati;
+  const euroMaturati=maturati*BP;
+  const euroSpesi=usati*BP;
+  const euroSaldoMese=saldoMese*BP;
+  const saldoData=calcSaldo();
+  const saldoGen=saldoData.available;
+  const euroSaldoGen=saldoGen*BP;
+  const mBg=saldoMese<0?'bg-red-50 dark:bg-red-900/20':'bg-blue-50 dark:bg-blue-900/20';
+  const mCol=saldoMese<0?'text-red-500':'text-blue-600 dark:text-blue-400';
+  const gBg=saldoGen<0?'bg-red-50 dark:bg-red-900/20':'bg-green-50 dark:bg-green-900/20';
+  const gCol=saldoGen<0?'text-red-500':'text-green-600 dark:text-green-400';
   document.getElementById('stats-title').textContent=`${MONTHS[cm]} ${cy}`;
   document.getElementById('stats-body').innerHTML=`
-    <div class="grid grid-cols-2 gap-3 mb-4">
-      <div class="col-span-2 rounded-2xl p-4 ${saldo>=0?'bg-blue-50 dark:bg-blue-900/20':'bg-red-50 dark:bg-red-900/20'}">
-        <div class="text-xs font-semibold uppercase tracking-wider ${saldo>=0?'text-blue-400':'text-red-400'} mb-1">D — Saldo</div>
-        <div class="text-4xl font-extrabold font-mono ${saldo>=0?'text-blue-600 dark:text-blue-400':'text-red-500'}">${saldo>0?'+':''}${saldo}</div>
-        <div class="text-xs text-gray-400 mt-1">buoni maturati − buoni usati</div>
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Questo mese — buoni</p>
+    <div class="grid grid-cols-3 gap-2 mb-3">
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">Maturati</div>
+        <div class="text-2xl font-extrabold font-mono">${maturati}</div>
+        <div class="text-[9px] text-gray-400">buoni</div>
       </div>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">A — Maturati</div>
-        <div class="text-3xl font-extrabold font-mono">${maturati}</div>
-        <div class="text-xs text-gray-400 mt-1">buoni (giorni lavoro)</div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">Usati</div>
+        <div class="text-2xl font-extrabold font-mono">${usati}</div>
+        <div class="text-[9px] text-gray-400">buoni</div>
       </div>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">B — Euro maturati</div>
-        <div class="text-3xl font-extrabold font-mono">€${maturati*BP}</div>
-        <div class="text-xs text-gray-400 mt-1">valore totale maturato</div>
-      </div>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">C — Usati</div>
-        <div class="text-3xl font-extrabold font-mono">${usati}</div>
-        <div class="text-xs text-gray-400 mt-1">buoni spesi (tutti i giorni)</div>
-      </div>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">B — Euro spesi</div>
-        <div class="text-3xl font-extrabold font-mono">€${usati*BP}</div>
-        <div class="text-xs text-gray-400 mt-1">valore totale speso</div>
+      <div class="${mBg} rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">Saldo</div>
+        <div class="text-2xl font-extrabold font-mono ${mCol}">${saldoMese>0?'+':''}${saldoMese}</div>
+        <div class="text-[9px] text-gray-400">buoni</div>
       </div>
     </div>
-    <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden">
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Questo mese — euro</p>
+    <div class="grid grid-cols-3 gap-2 mb-4">
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">€ Maturati</div>
+        <div class="text-lg font-extrabold font-mono">€${euroMaturati}</div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">€ Spesi</div>
+        <div class="text-lg font-extrabold font-mono">€${euroSpesi}</div>
+      </div>
+      <div class="${mBg} rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">€ Saldo</div>
+        <div class="text-lg font-extrabold font-mono ${mCol}">${euroSaldoMese>0?'+':''}€${euroSaldoMese}</div>
+      </div>
+    </div>
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Saldo generale (netto scadenze)</p>
+    <div class="grid grid-cols-2 gap-2 mb-4">
+      <div class="${gBg} rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">Buoni disponibili</div>
+        <div class="text-2xl font-extrabold font-mono ${gCol}">${saldoGen>0?'+':''}${saldoGen}</div>
+        <div class="text-[9px] text-gray-400">buoni</div>
+      </div>
+      <div class="${gBg} rounded-2xl p-3 text-center">
+        <div class="text-[10px] text-gray-400 mb-1">€ disponibili</div>
+        <div class="text-2xl font-extrabold font-mono ${gCol}">${euroSaldoGen>0?'+':''}€${euroSaldoGen}</div>
+        <div class="text-[9px] text-gray-400">valore</div>
+      </div>
+    </div>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden mb-4">
       <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">💼 Giorni lavorativi</span><span class="font-bold font-mono">${lav}</span></div>
       <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">☀️ Ferie</span><span class="font-bold font-mono">${fer}</span></div>
-      <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">😴 Riposo</span><span class="font-bold font-mono">${rip}</span></div>
-      <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">🎉 Festivi</span><span class="font-bold font-mono">${fes}</span></div>
-      <div class="flex justify-between items-center px-4 py-3"><span class="text-sm text-gray-500 font-semibold">📅 Totale giorni</span><span class="font-bold font-mono">${lav+fer+rip+fes}</span></div>
+      <div class="flex justify-between items-center px-4 py-3"><span class="text-sm text-gray-500">😴 Riposo</span><span class="font-bold font-mono">${rip}</span></div>
     </div>
     ${saldoData.groups.length>0?`
-    <div class="mt-4">
-      <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Scadenze buoni</p>
-      <div class="flex flex-col gap-2">
-        ${saldoData.groups.map(g=>`
-        <div class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3">
-          <span class="text-sm text-amber-700 dark:text-amber-300">⏳ Scadono il ${g.date}</span>
-          <span class="font-bold font-mono text-amber-700 dark:text-amber-300">${g.count} buon${g.count===1?'o':'i'} · €${g.count*BP}</span>
-        </div>`).join('')}
-      </div>
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Scadenze buoni</p>
+    <div class="flex flex-col gap-2">
+      ${saldoData.groups.map(g=>`
+      <div class="flex justify-between items-center bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl px-4 py-3">
+        <span class="text-sm text-amber-700 dark:text-amber-300">⏳ Scadono il ${g.date}</span>
+        <span class="font-bold font-mono text-amber-700 dark:text-amber-300">${g.count} buon${g.count===1?'o':'i'} · €${g.count*BP}</span>
+      </div>`).join('')}
     </div>`:''}`;
   document.getElementById('stats-overlay').classList.add('open');
   lockScroll();
@@ -540,7 +564,7 @@ function importCSV(){
 
 // Service Worker
 if('serviceWorker' in navigator){
-  const sw=`const C='bp-v6';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
+  const sw=`const C='bp-v7';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([location.pathname])).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
 }
 // Blocca scroll body solo quando un modale è aperto
