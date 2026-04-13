@@ -46,42 +46,56 @@ body{-webkit-font-smoothing:antialiased}
 <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900 text-white sticky top-0 z-40">
   <div class="pt-safe"></div>
   <div class="max-w-lg mx-auto px-5 pt-4 pb-5">
-    <!-- Top row -->
-    <div class="flex items-center justify-between mb-5">
-      <span class="text-sm font-semibold opacity-60 tracking-wide uppercase">Buoni Pasto</span>
+
+    <!-- Top row: titolo + navigazione mese -->
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <div class="text-xs font-semibold opacity-50 tracking-widest uppercase mb-0.5">Buoni Pasto</div>
+        <div class="text-lg font-bold" id="mlabel">—</div>
+      </div>
       <div class="flex gap-2">
         <button id="prev" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold text-lg active:scale-90 transition-all select-none">‹</button>
         <button id="next" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold text-lg active:scale-90 transition-all select-none">›</button>
       </div>
     </div>
-    <!-- Mese + saldo pool -->
-    <div class="mb-5">
-      <div class="text-base font-medium opacity-70 mb-1" id="mlabel">—</div>
+
+    <!-- Saldo grande (D: maturati − usati) -->
+    <div class="bg-white/10 border border-white/15 rounded-3xl px-5 py-4 mb-3">
+      <div class="text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">D — Saldo (maturati − usati)</div>
       <div class="flex items-baseline gap-2">
-        <span class="text-6xl font-extrabold font-mono tracking-tight" id="hero-pool">0</span>
-        <span class="text-lg font-semibold opacity-60">buoni</span>
-      </div>
-      <div class="text-sm opacity-60 mt-1">Pool disponibile · <span class="font-semibold opacity-90" id="hero-pool-euro">€0</span></div>
-    </div>
-    <!-- Stat chips -->
-    <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
-        <div class="text-lg font-bold font-mono" id="m-usati">0</div>
-        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">al lavoro</div>
-      </div>
-      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
-        <div class="text-lg font-bold font-mono" id="m-spesi">0</div>
-        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">in ferie/rip.</div>
-      </div>
-      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
-        <div class="text-lg font-bold font-mono" id="m-acc">0</div>
-        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">accumulati</div>
-      </div>
-      <div class="flex-shrink-0 bg-white/10 border border-white/10 rounded-2xl px-3.5 py-2.5 text-center min-w-[68px]">
-        <div class="text-lg font-bold font-mono" id="m-euro">€0</div>
-        <div class="text-[10px] opacity-60 mt-0.5 whitespace-nowrap">valore tot.</div>
+        <span class="text-5xl font-extrabold font-mono tracking-tight" id="hero-saldo">0</span>
+        <span class="text-base font-semibold opacity-70">buoni</span>
       </div>
     </div>
+
+    <!-- Griglia 2×2: A, B, C -->
+    <div class="grid grid-cols-2 gap-2">
+      <!-- A: Buoni maturati -->
+      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
+        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">A — Maturati</div>
+        <div class="text-2xl font-extrabold font-mono" id="stat-maturati">0</div>
+        <div class="text-xs opacity-60 mt-0.5">buoni (giorni lavoro)</div>
+      </div>
+      <!-- B: Euro maturati -->
+      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
+        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">B — Euro maturati</div>
+        <div class="text-2xl font-extrabold font-mono" id="stat-euro-maturati">€0</div>
+        <div class="text-xs opacity-60 mt-0.5">valore buoni maturati</div>
+      </div>
+      <!-- C: Buoni usati -->
+      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
+        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">C — Usati</div>
+        <div class="text-2xl font-extrabold font-mono" id="stat-usati">0</div>
+        <div class="text-xs opacity-60 mt-0.5">buoni spesi (tutti i giorni)</div>
+      </div>
+      <!-- B: Euro spesi -->
+      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
+        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">B — Euro spesi</div>
+        <div class="text-2xl font-extrabold font-mono" id="stat-euro-spesi">€0</div>
+        <div class="text-xs opacity-60 mt-0.5">valore buoni spesi</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -252,22 +266,31 @@ function renderCal(){
 
 function updateStats(){
   const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
-  let usati=0,spesi=0,accMese=0;
+  // A: maturati = tutti i giorni lavoro del mese (1 per giorno)
+  let maturati=0;
+  // C: usati = somma di tutti i bp su qualsiasi giornata del mese
+  let usati=0;
   Object.entries(_cache).forEach(([k,e])=>{
     if(!k.startsWith(prefix)) return;
-    if(e.type==='lavoro'&&!e.acc) usati+=(e.bp||0);
-    if(e.type==='lavoro'&&e.acc) accMese++;
-    if((e.type==='ferie'||e.type==='riposo')&&e.bp>0) spesi+=e.bp;
+    if(e.type==='lavoro') maturati++;
+    usati+=(e.bp||0);
   });
-  const pool=getPool();
-  const heroPool=Math.max(0,pool.available);
-  document.getElementById('hero-pool').textContent=heroPool;
-  document.getElementById('hero-pool').style.color=pool.available<0?'#FCA5A5':'';
-  document.getElementById('hero-pool-euro').textContent='€'+(heroPool*BP);
-  document.getElementById('m-usati').textContent=usati;
-  document.getElementById('m-spesi').textContent=spesi;
-  document.getElementById('m-acc').textContent=accMese;
-  document.getElementById('m-euro').textContent='€'+((usati+spesi)*BP);
+  // D: saldo = maturati − usati (può essere negativo)
+  const saldo=maturati-usati;
+  // B: euro
+  const euroMaturati=maturati*BP;
+  const euroSpesi=usati*BP;
+
+  // Saldo grande
+  const saldoEl=document.getElementById('hero-saldo');
+  saldoEl.textContent=(saldo>0?'+':'')+saldo;
+  saldoEl.style.color=saldo<0?'#FCA5A5':'';
+
+  // Griglia
+  document.getElementById('stat-maturati').textContent=maturati;
+  document.getElementById('stat-euro-maturati').textContent='€'+euroMaturati;
+  document.getElementById('stat-usati').textContent=usati;
+  document.getElementById('stat-euro-spesi').textContent='€'+euroSpesi;
 }
 
 // Modale
@@ -341,22 +364,45 @@ document.getElementById('next').addEventListener('click',()=>{cm++;if(cm>11){cm=
 // Riepilogo
 function showStats(){
   const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
-  let lav=0,fer=0,rip=0,fes=0,usati=0,spesi=0,accM=0;
+  let lav=0,fer=0,rip=0,fes=0,usati=0;
   Object.entries(_cache).forEach(([k,e])=>{
     if(!k.startsWith(prefix)) return;
-    if(e.type==='lavoro'){lav++;if(!e.acc)usati+=(e.bp||0);if(e.acc)accM++;}
-    if(e.type==='ferie'){fer++;if(e.bp>0)spesi+=e.bp;}
-    if(e.type==='riposo'){rip++;if(e.bp>0)spesi+=e.bp;}
+    if(e.type==='lavoro') lav++;
+    if(e.type==='ferie') fer++;
+    if(e.type==='riposo') rip++;
     if(e.type==='festivo') fes++;
+    usati+=(e.bp||0);
   });
-  const pool=getPool();
+  const maturati=lav;
+  const saldo=maturati-usati;
   document.getElementById('stats-title').textContent=`${MONTHS[cm]} ${cy}`;
   document.getElementById('stats-body').innerHTML=`
-    <div class="grid grid-cols-2 gap-3 mb-5">
-      <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-4"><div class="text-2xl mb-2">🟣</div><div class="text-3xl font-extrabold font-mono text-indigo-600">${pool.available}</div><div class="text-xs text-gray-400 mt-1">Pool disponibile</div></div>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4"><div class="text-2xl mb-2">💶</div><div class="text-3xl font-extrabold font-mono">${(usati+spesi)*BP}€</div><div class="text-xs text-gray-400 mt-1">Valore totale usato</div></div>
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4"><div class="text-2xl mb-2">💼</div><div class="text-3xl font-extrabold font-mono">${usati}</div><div class="text-xs text-gray-400 mt-1">Usati al lavoro</div></div>
-      <div class="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4"><div class="text-2xl mb-2">🏖️</div><div class="text-3xl font-extrabold font-mono text-amber-600">${spesi}</div><div class="text-xs text-gray-400 mt-1">Spesi in ferie/rip.</div></div>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="col-span-2 rounded-2xl p-4 ${saldo>=0?'bg-indigo-50 dark:bg-indigo-900/20':'bg-red-50 dark:bg-red-900/20'}">
+        <div class="text-xs font-semibold uppercase tracking-wider ${saldo>=0?'text-indigo-400':'text-red-400'} mb-1">D — Saldo</div>
+        <div class="text-4xl font-extrabold font-mono ${saldo>=0?'text-indigo-600 dark:text-indigo-400':'text-red-500'}">${saldo>0?'+':''}${saldo}</div>
+        <div class="text-xs text-gray-400 mt-1">buoni maturati − buoni usati</div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">A — Maturati</div>
+        <div class="text-3xl font-extrabold font-mono">${maturati}</div>
+        <div class="text-xs text-gray-400 mt-1">buoni (giorni lavoro)</div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">B — Euro maturati</div>
+        <div class="text-3xl font-extrabold font-mono">€${maturati*BP}</div>
+        <div class="text-xs text-gray-400 mt-1">valore totale maturato</div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">C — Usati</div>
+        <div class="text-3xl font-extrabold font-mono">${usati}</div>
+        <div class="text-xs text-gray-400 mt-1">buoni spesi (tutti i giorni)</div>
+      </div>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
+        <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">B — Euro spesi</div>
+        <div class="text-3xl font-extrabold font-mono">€${usati*BP}</div>
+        <div class="text-xs text-gray-400 mt-1">valore totale speso</div>
+      </div>
     </div>
     <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl overflow-hidden">
       <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100 dark:border-gray-700"><span class="text-sm text-gray-500">💼 Giorni lavorativi</span><span class="font-bold font-mono">${lav}</span></div>
