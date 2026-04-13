@@ -60,53 +60,55 @@ body{-webkit-font-smoothing:antialiased}
       </div>
     </div>
 
-    <!-- Riga 1: Maturati | Usati | Saldo (3 colonne) -->
-    <div class="grid grid-cols-3 gap-2 mb-2">
-
-      <!-- Buoni maturati -->
-      <div class="bg-white/20 rounded-2xl px-2.5 py-2.5">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Maturati</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-maturati">0</div>
-        <div class="text-[9px] opacity-55 mt-1">buoni</div>
+    <!-- Riga 1: Questo mese — buoni -->
+    <p class="text-[9px] font-semibold opacity-50 uppercase tracking-widest mb-1.5">Questo mese</p>
+    <div class="grid grid-cols-3 gap-1.5 mb-1.5">
+      <div class="bg-white/15 rounded-xl px-2.5 py-2">
+        <div class="text-[9px] opacity-60 uppercase tracking-wide mb-0.5">Maturati</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-maturati">0</div>
+        <div class="text-[9px] opacity-50 mt-0.5">buoni</div>
       </div>
-
-      <!-- Buoni usati -->
-      <div class="bg-white/20 rounded-2xl px-2.5 py-2.5">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Usati</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-usati">0</div>
-        <div class="text-[9px] opacity-55 mt-1">buoni</div>
+      <div class="bg-white/15 rounded-xl px-2.5 py-2">
+        <div class="text-[9px] opacity-60 uppercase tracking-wide mb-0.5">Usati</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-usati">0</div>
+        <div class="text-[9px] opacity-50 mt-0.5">buoni</div>
       </div>
-
-      <!-- Saldo (verde/rosso dinamico) -->
-      <div class="rounded-2xl px-2.5 py-2.5" id="saldo-card">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Saldo</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="hero-saldo">0</div>
-        <div class="text-[9px] opacity-55 mt-1">mat. − usati</div>
+      <div class="bg-white/15 rounded-xl px-2.5 py-2" id="saldo-mese-card">
+        <div class="text-[9px] opacity-60 uppercase tracking-wide mb-0.5">Saldo mese</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-saldo-mese">0</div>
+        <div class="text-[9px] opacity-50 mt-0.5">buoni</div>
       </div>
-
     </div>
 
-    <!-- Riga 2: Euro maturati | Euro spesi | Euro saldo (3 colonne) -->
-    <div class="grid grid-cols-3 gap-2">
-
-      <div class="bg-white/10 rounded-2xl px-2.5 py-2.5">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">€ maturati</div>
-        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-maturati">€0</div>
-        <div class="text-[9px] opacity-55 mt-1">valore mat.</div>
+    <!-- Riga 2: Questo mese — euro -->
+    <div class="grid grid-cols-3 gap-1.5 mb-2">
+      <div class="bg-white/10 rounded-xl px-2.5 py-2">
+        <div class="text-[9px] opacity-60 uppercase tracking-wide mb-0.5">€ maturati</div>
+        <div class="text-lg font-extrabold font-mono leading-none" id="stat-euro-maturati">€0</div>
       </div>
-
-      <div class="bg-white/10 rounded-2xl px-2.5 py-2.5">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">€ spesi</div>
-        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-spesi">€0</div>
-        <div class="text-[9px] opacity-55 mt-1">valore speso</div>
+      <div class="bg-white/10 rounded-xl px-2.5 py-2">
+        <div class="text-[9px] opacity-60 uppercase tracking-wide mb-0.5">€ spesi</div>
+        <div class="text-lg font-extrabold font-mono leading-none" id="stat-euro-spesi">€0</div>
       </div>
-
-      <div class="rounded-2xl px-2.5 py-2.5" id="euro-saldo-card">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">€ saldo</div>
-        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-saldo">€0</div>
-        <div class="text-[9px] opacity-55 mt-1">mat. − spesi</div>
+      <div class="bg-white/10 rounded-xl px-2.5 py-2" id="euro-saldo-mese-card">
+        <div class="text-[9px] opacity-60 uppercase tracking-wide mb-0.5">€ saldo</div>
+        <div class="text-lg font-extrabold font-mono leading-none" id="stat-euro-saldo-mese">€0</div>
       </div>
+    </div>
 
+    <!-- Riga 3: Generale (cumulativo con scadenze) -->
+    <p class="text-[9px] font-semibold opacity-50 uppercase tracking-widest mb-1.5">Saldo generale</p>
+    <div class="grid grid-cols-2 gap-1.5">
+      <div class="rounded-xl px-2.5 py-2" id="saldo-gen-card">
+        <div class="text-[9px] opacity-70 uppercase tracking-wide mb-0.5">Buoni disponibili</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-saldo-gen">0</div>
+        <div class="text-[9px] opacity-50 mt-0.5">netto scadenze</div>
+      </div>
+      <div class="rounded-xl px-2.5 py-2" id="euro-saldo-gen-card">
+        <div class="text-[9px] opacity-70 uppercase tracking-wide mb-0.5">€ disponibili</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-saldo-gen">€0</div>
+        <div class="text-[9px] opacity-50 mt-0.5">netto scadenze</div>
+      </div>
     </div>
   </div>
 </div>
@@ -310,68 +312,61 @@ function renderCal(){
   updateStats();
 }
 
+function setEl(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+function colorCard(cardId,valId,val,pos,neg){
+  const card=document.getElementById(cardId);
+  const el=document.getElementById(valId);
+  if(!card||!el) return;
+  card.className=card.className.replace(/bg-\S+/g,'').trim()+' '+(val<0?neg:pos);
+  el.style.color=val<0?'#FEE2E2':'';
+}
+
 function updateStats(){
+  // ── Mensile ──────────────────────────────────────────────
   const prefix=`${cy}-${String(cm+1).padStart(2,'0')}`;
-  // Mensile: maturati e usati del mese corrente
   let maturati=0, usati=0;
   Object.entries(_cache).forEach(([k,e])=>{
     if(!k.startsWith(prefix)) return;
     if(e.type==='lavoro') maturati++;
     usati+=(e.bp||0);
   });
+  const saldoMese=maturati-usati;
   const euroMaturati=maturati*BP;
   const euroSpesi=usati*BP;
+  const euroSaldoMese=saldoMese*BP;
 
-  // Cumulativo: saldo con regola scadenza FIFO
+  setEl('stat-maturati', maturati);
+  setEl('stat-usati', usati);
+  setEl('stat-euro-maturati', '€'+euroMaturati);
+  setEl('stat-euro-spesi', '€'+euroSpesi);
+  setEl('stat-saldo-mese', (saldoMese>0?'+':'')+saldoMese);
+  setEl('stat-euro-saldo-mese', (euroSaldoMese>0?'+':'')+'€'+euroSaldoMese);
+  colorCard('saldo-mese-card','stat-saldo-mese',saldoMese,'bg-green-500/25','bg-red-500/35');
+  colorCard('euro-saldo-mese-card','stat-euro-saldo-mese',euroSaldoMese,'bg-green-500/20','bg-red-500/30');
+
+  // ── Generale cumulativo (con scadenze FIFO) ───────────────
   const saldoData=calcSaldo();
-  const saldo=saldoData.available;
-  const euroSaldo=saldo*BP;
+  const saldoGen=saldoData.available;
+  const euroSaldoGen=saldoGen*BP;
 
-  // Card saldo buoni (cumulativo)
-  const saldoEl=document.getElementById('hero-saldo');
-  saldoEl.textContent=(saldo>0?'+':'')+saldo;
-  const saldoCard=document.getElementById('saldo-card');
-  if(saldoCard){
-    saldoCard.className=`rounded-2xl px-2.5 py-2.5 ${saldo<0?'bg-red-500/40':'bg-green-500/30'}`;
-    saldoEl.style.color=saldo<0?'#FEE2E2':'';
-  }
+  setEl('stat-saldo-gen', (saldoGen>0?'+':'')+saldoGen);
+  setEl('stat-euro-saldo-gen', (euroSaldoGen>0?'+':'')+'€'+euroSaldoGen);
+  colorCard('saldo-gen-card','stat-saldo-gen',saldoGen,'bg-green-500/30','bg-red-500/40');
+  colorCard('euro-saldo-gen-card','stat-euro-saldo-gen',euroSaldoGen,'bg-green-500/25','bg-red-500/35');
 
-  // Card euro saldo (cumulativo)
-  const euroSaldoCard=document.getElementById('euro-saldo-card');
-  const euroSaldoEl=document.getElementById('stat-euro-saldo');
-  if(euroSaldoCard&&euroSaldoEl){
-    euroSaldoCard.className=`rounded-2xl px-2.5 py-2.5 ${euroSaldo<0?'bg-red-500/40':'bg-green-500/30'}`;
-    euroSaldoEl.textContent=(euroSaldo>0?'+':'')+'€'+euroSaldo;
-    euroSaldoEl.style.color=euroSaldo<0?'#FEE2E2':'';
-  }
-
-  // Aggiorna card mensili
-  const ids={
-    'stat-maturati': maturati,
-    'stat-usati': usati,
-    'stat-euro-maturati': '€'+euroMaturati,
-    'stat-euro-spesi': '€'+euroSpesi
-  };
-  Object.entries(ids).forEach(([id,val])=>{
-    const el=document.getElementById(id);
-    if(el) el.textContent=val;
-  });
-
-  // Banner scadenza: mostra avviso se ci sono buoni in scadenza entro l'anno corrente
+  // ── Banner scadenza ───────────────────────────────────────
   const expBanner=document.getElementById('exp-banner');
   if(expBanner){
-    const today=new Date();
-    const thisYear=today.getFullYear();
-    const expiringThisYear=saldoData.groups.filter(g=>g.year===thisYear);
-    if(expiringThisYear.length>0){
-      const tot=expiringThisYear.reduce((s,g)=>s+g.count,0);
+    const thisYear=new Date().getFullYear();
+    const expThisYear=saldoData.groups.filter(g=>g.year===thisYear);
+    if(expThisYear.length>0){
+      const tot=expThisYear.reduce((s,g)=>s+g.count,0);
       expBanner.innerHTML=`⚠️ <strong>${tot} buon${tot===1?'o':'i'}</strong> scadon${tot===1?'e':'o'} il <strong>31/12/${thisYear}</strong> — usali entro l'anno!`;
       expBanner.classList.remove('hidden');
     } else {
       expBanner.classList.add('hidden');
     }
   }
-
 }
 
 // Modale
