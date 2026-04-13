@@ -86,19 +86,25 @@ body{-webkit-font-smoothing:antialiased}
 
     </div>
 
-    <!-- Riga 2: Euro maturati | Euro spesi (2 colonne) -->
-    <div class="grid grid-cols-2 gap-2">
+    <!-- Riga 2: Euro maturati | Euro spesi | Euro saldo (3 colonne) -->
+    <div class="grid grid-cols-3 gap-2">
 
-      <div class="bg-white/10 rounded-2xl px-3 py-2.5">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro maturati</div>
+      <div class="bg-white/10 rounded-2xl px-2.5 py-2.5">
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">€ maturati</div>
         <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-maturati">€0</div>
-        <div class="text-[9px] opacity-55 mt-1">valore maturato</div>
+        <div class="text-[9px] opacity-55 mt-1">valore mat.</div>
       </div>
 
-      <div class="bg-white/10 rounded-2xl px-3 py-2.5">
-        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro spesi</div>
+      <div class="bg-white/10 rounded-2xl px-2.5 py-2.5">
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">€ spesi</div>
         <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-spesi">€0</div>
         <div class="text-[9px] opacity-55 mt-1">valore speso</div>
+      </div>
+
+      <div class="rounded-2xl px-2.5 py-2.5" id="euro-saldo-card">
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">€ saldo</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-saldo">€0</div>
+        <div class="text-[9px] opacity-55 mt-1">mat. − spesi</div>
       </div>
 
     </div>
@@ -300,17 +306,29 @@ function updateStats(){
     saldoEl.style.color='';
   }
 
+  // Euro saldo
+  const euroSaldo=euroMaturati-euroSpesi;
+
   // Aggiorna tutte le card
   const ids={
     'stat-maturati': maturati,
     'stat-usati': usati,
     'stat-euro-maturati': '€'+euroMaturati,
-    'stat-euro-spesi': '€'+euroSpesi
+    'stat-euro-spesi': '€'+euroSpesi,
+    'stat-euro-saldo': (euroSaldo>0?'+':'')+'€'+euroSaldo
   };
   Object.entries(ids).forEach(([id,val])=>{
     const el=document.getElementById(id);
     if(el) el.textContent=val;
   });
+
+  // Colora card euro saldo (stesso schema del saldo buoni)
+  const euroSaldoCard=document.getElementById('euro-saldo-card');
+  if(euroSaldoCard){
+    euroSaldoCard.className=`rounded-2xl px-2.5 py-2.5 ${euroSaldo<0?'bg-red-500/40':'bg-green-500/30'}`;
+    const el=document.getElementById('stat-euro-saldo');
+    if(el) el.style.color=euroSaldo<0?'#FEE2E2':'';
+  }
 }
 
 // Modale
