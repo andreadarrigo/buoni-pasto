@@ -43,59 +43,55 @@ body{-webkit-font-smoothing:antialiased}
 <body class="bg-gray-100 dark:bg-gray-950 font-sans text-gray-900 dark:text-gray-100 min-h-screen">
 
 <!-- Hero header -->
-<div class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white sticky top-0 z-40">
+<div class="bg-gradient-to-br from-blue-600 to-blue-800 text-white sticky top-0 z-40 shadow-lg">
   <div class="pt-safe"></div>
-  <div class="max-w-lg mx-auto px-5 pt-4 pb-5">
+  <div class="max-w-lg mx-auto px-4 pt-3 pb-3">
 
-    <!-- Top row: titolo + navigazione mese -->
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <div class="text-xs font-semibold opacity-50 tracking-widest uppercase mb-0.5">Buoni Pasto</div>
-        <div class="text-lg font-bold" id="mlabel">—</div>
+    <!-- Riga titolo + mese + nav -->
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold opacity-50 uppercase tracking-widest">Buoni Pasto</span>
+        <span class="opacity-30">·</span>
+        <span class="text-sm font-bold" id="mlabel">—</span>
       </div>
-      <div class="flex gap-2">
-        <button id="prev" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold text-lg active:scale-90 transition-all select-none">‹</button>
-        <button id="next" class="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center font-bold text-lg active:scale-90 transition-all select-none">›</button>
-      </div>
-    </div>
-
-    <!-- Saldo grande (D: maturati − usati) -->
-    <div class="bg-white/10 border border-white/15 rounded-3xl px-5 py-4 mb-3">
-      <div class="text-xs font-semibold opacity-60 uppercase tracking-wider mb-2">D — Saldo (maturati − usati)</div>
-      <div class="flex items-baseline gap-2">
-        <span class="text-5xl font-extrabold font-mono tracking-tight" id="hero-saldo">0</span>
-        <span class="text-base font-semibold opacity-70">buoni</span>
+      <div class="flex gap-1.5">
+        <button id="prev" class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center font-bold active:bg-white/30 transition-colors select-none">‹</button>
+        <button id="next" class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center font-bold active:bg-white/30 transition-colors select-none">›</button>
       </div>
     </div>
 
-    <!-- Griglia 2×2: A, B, C -->
+    <!-- Griglia 2×2 compatta -->
     <div class="grid grid-cols-2 gap-2">
-      <!-- A: Buoni maturati -->
-      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
-        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">A — Maturati</div>
-        <div class="text-2xl font-extrabold font-mono" id="stat-maturati">0</div>
-        <div class="text-xs opacity-60 mt-0.5">buoni (giorni lavoro)</div>
-      </div>
-      <!-- B: Euro maturati -->
-      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
-        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">B — Euro maturati</div>
-        <div class="text-2xl font-extrabold font-mono" id="stat-euro-maturati">€0</div>
-        <div class="text-xs opacity-60 mt-0.5">valore buoni maturati</div>
-      </div>
-      <!-- C: Buoni usati -->
-      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
-        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">C — Usati</div>
-        <div class="text-2xl font-extrabold font-mono" id="stat-usati">0</div>
-        <div class="text-xs opacity-60 mt-0.5">buoni spesi (tutti i giorni)</div>
-      </div>
-      <!-- B: Euro spesi -->
-      <div class="bg-white/10 border border-white/15 rounded-2xl px-4 py-3">
-        <div class="text-[10px] font-semibold opacity-55 uppercase tracking-wider mb-1">B — Euro spesi</div>
-        <div class="text-2xl font-extrabold font-mono" id="stat-euro-spesi">€0</div>
-        <div class="text-xs opacity-60 mt-0.5">valore buoni spesi</div>
-      </div>
-    </div>
 
+      <!-- Maturati (blu chiaro) -->
+      <div class="bg-white/20 rounded-2xl px-3 py-2.5">
+        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Maturati</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-maturati">0</div>
+        <div class="text-[10px] opacity-60 mt-1">buoni (giorni lavoro)</div>
+      </div>
+
+      <!-- Saldo (verde se positivo, rosso se negativo) -->
+      <div class="rounded-2xl px-3 py-2.5 bg-white/20" id="saldo-card">
+        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Saldo</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="hero-saldo">0</div>
+        <div class="text-[10px] opacity-60 mt-1">maturati − usati</div>
+      </div>
+
+      <!-- Euro maturati (sfondo leggermente diverso) -->
+      <div class="bg-white/10 rounded-2xl px-3 py-2.5">
+        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro maturati</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-euro-maturati">€0</div>
+        <div class="text-[10px] opacity-60 mt-1">valore maturato</div>
+      </div>
+
+      <!-- Euro spesi -->
+      <div class="bg-white/10 rounded-2xl px-3 py-2.5">
+        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro spesi</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-euro-spesi">€0</div>
+        <div class="text-[10px] opacity-60 mt-1">valore speso</div>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -281,10 +277,18 @@ function updateStats(){
   const euroMaturati=maturati*BP;
   const euroSpesi=usati*BP;
 
-  // Saldo grande
+  // Saldo
   const saldoEl=document.getElementById('hero-saldo');
   saldoEl.textContent=(saldo>0?'+':'')+saldo;
-  saldoEl.style.color=saldo<0?'#FCA5A5':'';
+  // Card saldo: verde se positivo/zero, rosso se negativo
+  const saldoCard=document.getElementById('saldo-card');
+  if(saldo<0){
+    saldoCard.className='rounded-2xl px-3 py-2.5 bg-red-500/40';
+    saldoEl.style.color='#FEE2E2';
+  } else {
+    saldoCard.className='rounded-2xl px-3 py-2.5 bg-green-500/30';
+    saldoEl.style.color='';
+  }
 
   // Griglia
   document.getElementById('stat-maturati').textContent=maturati;
