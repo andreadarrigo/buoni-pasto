@@ -60,35 +60,45 @@ body{-webkit-font-smoothing:antialiased}
       </div>
     </div>
 
-    <!-- Griglia 2×2 compatta -->
+    <!-- Riga 1: Maturati | Usati | Saldo (3 colonne) -->
+    <div class="grid grid-cols-3 gap-2 mb-2">
+
+      <!-- Buoni maturati -->
+      <div class="bg-white/20 rounded-2xl px-2.5 py-2.5">
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Maturati</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-maturati">0</div>
+        <div class="text-[9px] opacity-55 mt-1">buoni</div>
+      </div>
+
+      <!-- Buoni usati -->
+      <div class="bg-white/20 rounded-2xl px-2.5 py-2.5">
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Usati</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-usati">0</div>
+        <div class="text-[9px] opacity-55 mt-1">buoni</div>
+      </div>
+
+      <!-- Saldo (verde/rosso dinamico) -->
+      <div class="rounded-2xl px-2.5 py-2.5" id="saldo-card">
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Saldo</div>
+        <div class="text-2xl font-extrabold font-mono leading-none" id="hero-saldo">0</div>
+        <div class="text-[9px] opacity-55 mt-1">mat. − usati</div>
+      </div>
+
+    </div>
+
+    <!-- Riga 2: Euro maturati | Euro spesi (2 colonne) -->
     <div class="grid grid-cols-2 gap-2">
 
-      <!-- Maturati (blu chiaro) -->
-      <div class="bg-white/20 rounded-2xl px-3 py-2.5">
-        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Maturati</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-maturati">0</div>
-        <div class="text-[10px] opacity-60 mt-1">buoni (giorni lavoro)</div>
-      </div>
-
-      <!-- Saldo (verde se positivo, rosso se negativo) -->
-      <div class="rounded-2xl px-3 py-2.5 bg-white/20" id="saldo-card">
-        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Saldo</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="hero-saldo">0</div>
-        <div class="text-[10px] opacity-60 mt-1">maturati − usati</div>
-      </div>
-
-      <!-- Euro maturati (sfondo leggermente diverso) -->
       <div class="bg-white/10 rounded-2xl px-3 py-2.5">
-        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro maturati</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-euro-maturati">€0</div>
-        <div class="text-[10px] opacity-60 mt-1">valore maturato</div>
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro maturati</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-maturati">€0</div>
+        <div class="text-[9px] opacity-55 mt-1">valore maturato</div>
       </div>
 
-      <!-- Euro spesi -->
       <div class="bg-white/10 rounded-2xl px-3 py-2.5">
-        <div class="text-[10px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro spesi</div>
-        <div class="text-2xl font-extrabold font-mono leading-none" id="stat-euro-spesi">€0</div>
-        <div class="text-[10px] opacity-60 mt-1">valore speso</div>
+        <div class="text-[9px] font-semibold opacity-70 uppercase tracking-wide mb-1">Euro spesi</div>
+        <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-spesi">€0</div>
+        <div class="text-[9px] opacity-55 mt-1">valore speso</div>
       </div>
 
     </div>
@@ -290,11 +300,17 @@ function updateStats(){
     saldoEl.style.color='';
   }
 
-  // Griglia
-  document.getElementById('stat-maturati').textContent=maturati;
-  document.getElementById('stat-euro-maturati').textContent='€'+euroMaturati;
-  document.getElementById('stat-usati').textContent=usati;
-  document.getElementById('stat-euro-spesi').textContent='€'+euroSpesi;
+  // Aggiorna tutte le card
+  const ids={
+    'stat-maturati': maturati,
+    'stat-usati': usati,
+    'stat-euro-maturati': '€'+euroMaturati,
+    'stat-euro-spesi': '€'+euroSpesi
+  };
+  Object.entries(ids).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=val;
+  });
 }
 
 // Modale
