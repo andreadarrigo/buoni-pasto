@@ -7,11 +7,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Buoni Pasto">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#4F46E5">
+<meta name="theme-color" content="#2563EB">
 <title>Buoni Pasto</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-tailwind.config={darkMode:'media',theme:{extend:{colors:{brand:{DEFAULT:'#4F46E5',dark:'#3730A3',light:'#EEF2FF'}},fontFamily:{sans:['Inter','system-ui','sans-serif'],mono:['"DM Mono"','monospace']}}}}
+tailwind.config={darkMode:'media',theme:{extend:{colors:{brand:{DEFAULT:'#2563EB',dark:'#1D4ED8',light:'#EFF6FF'}},fontFamily:{sans:['Inter','system-ui','sans-serif'],mono:['"DM Mono"','monospace']}}}}
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -19,12 +19,12 @@ tailwind.config={darkMode:'media',theme:{extend:{colors:{brand:{DEFAULT:'#4F46E5
 body{-webkit-font-smoothing:antialiased}
 .pt-safe{padding-top:env(safe-area-inset-top,0px)}
 .pb-safe{padding-bottom:env(safe-area-inset-bottom,0px)}
-.t-lavoro{border-left:3px solid #4F46E5;background:#EEF2FF}
+.t-lavoro{border-left:3px solid #2563EB;background:#EFF6FF}
 .t-ferie{border-left:3px solid #F59E0B;background:#FFFBEB}
 .t-riposo{border-left:3px solid #94A3B8;background:#F8FAFC}
 .t-festivo{border-left:3px solid #EF4444;background:#FEF2F2}
 @media(prefers-color-scheme:dark){
-  .t-lavoro{border-left-color:#818CF8;background:rgba(79,70,229,.15)}
+  .t-lavoro{border-left-color:#60A5FA;background:rgba(37,99,235,.15)}
   .t-ferie{border-left-color:#FCD34D;background:rgba(245,158,11,.12)}
   .t-riposo{border-left-color:#94A3B8;background:rgba(148,163,184,.1)}
   .t-festivo{border-left-color:#F87171;background:rgba(239,68,68,.1)}
@@ -43,7 +43,7 @@ body{-webkit-font-smoothing:antialiased}
 <body class="bg-gray-100 dark:bg-gray-950 font-sans text-gray-900 dark:text-gray-100 min-h-screen">
 
 <!-- Hero header -->
-<div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-900 text-white sticky top-0 z-40">
+<div class="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white sticky top-0 z-40">
   <div class="pt-safe"></div>
   <div class="max-w-lg mx-auto px-5 pt-4 pb-5">
 
@@ -120,7 +120,7 @@ body{-webkit-font-smoothing:antialiased}
 <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 pb-safe flex gap-2 z-50 shadow-lg">
   <button onclick="exportCSV()" class="flex-1 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 active:scale-95 transition-transform select-none">📥 Esporta</button>
   <button onclick="importCSV()" class="flex-1 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 active:scale-95 transition-transform select-none">📂 Importa</button>
-  <button onclick="showStats()" class="flex-1 py-3 rounded-2xl bg-indigo-600 text-white text-sm font-bold active:scale-95 transition-transform select-none shadow-md shadow-indigo-500/30">📊 Riepilogo</button>
+  <button onclick="showStats()" class="flex-1 py-3 rounded-2xl bg-blue-600 text-white text-sm font-bold active:scale-95 transition-transform select-none shadow-md shadow-blue-500/30">📊 Riepilogo</button>
 </div>
 
 <!-- Modale giorno -->
@@ -171,14 +171,14 @@ body{-webkit-font-smoothing:antialiased}
               <button id="cminus" class="w-14 h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center text-3xl font-light text-gray-600 dark:text-gray-300 active:scale-90 transition-transform select-none">−</button>
               <div class="flex-1 text-center">
                 <span class="text-5xl font-extrabold font-mono block" id="ccount">0</span>
-                <span class="text-sm font-semibold text-indigo-500 mt-1 block" id="ceuro"></span>
+                <span class="text-sm font-semibold text-blue-500 mt-1 block" id="ceuro"></span>
               </div>
               <button id="cplus" class="w-14 h-14 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center text-3xl font-light text-gray-600 dark:text-gray-300 active:scale-90 transition-transform select-none">+</button>
             </div>
           </div>
         </div>
       </div>
-      <button id="savebtn" class="w-full mt-6 py-4 rounded-2xl bg-indigo-600 text-white font-bold text-base shadow-lg shadow-indigo-500/25 active:scale-[.98] transition-transform select-none">Salva giornata</button>
+      <button id="savebtn" class="w-full mt-6 py-4 rounded-2xl bg-blue-600 text-white font-bold text-base shadow-lg shadow-blue-500/25 active:scale-[.98] transition-transform select-none">Salva giornata</button>
       <button id="clearbtn" class="w-full mt-2.5 py-3.5 rounded-2xl border-2 border-gray-200 dark:border-gray-700 text-red-500 font-semibold text-sm active:bg-red-50 dark:active:bg-red-900/20 transition-colors select-none">Rimuovi impostazione</button>
     </div>
   </div>
@@ -193,7 +193,7 @@ body{-webkit-font-smoothing:antialiased}
     </div>
     <div class="px-5 pb-6">
       <div id="stats-body"></div>
-      <button onclick="closeStatsModal()" class="w-full mt-5 py-4 rounded-2xl bg-indigo-600 text-white font-bold active:scale-[.98] transition-transform select-none">Chiudi</button>
+      <button onclick="closeStatsModal()" class="w-full mt-5 py-4 rounded-2xl bg-blue-600 text-white font-bold active:scale-[.98] transition-transform select-none">Chiudi</button>
     </div>
   </div>
 </div>
@@ -246,16 +246,16 @@ function renderCal(){
       'day-cell rounded-xl border border-gray-200 dark:border-gray-800 p-1.5 cursor-pointer select-none',
       'min-h-[60px] flex flex-col items-center bg-white dark:bg-gray-900',
       en.type?`t-${en.type}`:'',
-      isToday?'ring-2 ring-indigo-400 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-950':''
+      isToday?'ring-2 ring-blue-400 ring-offset-1 ring-offset-gray-100 dark:ring-offset-gray-950':''
     ].filter(Boolean).join(' ');
     let badge='';
     if(en.type==='lavoro'){
-      if(en.bp>0) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 leading-none">${en.bp}×</span>`;
+      if(en.bp>0) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-600 leading-none">${en.bp}×</span>`;
       else if(en.acc) badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-600 leading-none">acc.</span>`;
     } else if((en.type==='ferie'||en.type==='riposo')&&en.bp>0){
       badge=`<span class="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-600 leading-none">${en.bp}×</span>`;
     }
-    el.innerHTML=`<span class="text-[11px] font-semibold ${isToday?'text-indigo-500':isWe?'text-red-400':'text-gray-400'} self-start leading-none w-full text-center">${d}</span><span class="text-lg flex-1 flex items-center">${en.type?ICONS[en.type]:''}</span>${badge}`;
+    el.innerHTML=`<span class="text-[11px] font-semibold ${isToday?'text-blue-500':isWe?'text-red-400':'text-gray-400'} self-start leading-none w-full text-center">${d}</span><span class="text-lg flex-1 flex items-center">${en.type?ICONS[en.type]:''}</span>${badge}`;
     el.addEventListener('click',()=>openModal(d));
     grid.appendChild(el);
   }
@@ -308,7 +308,7 @@ function renderMs(){
   const pool=getPool();
   // Pulsanti tipo
   const C={
-    lavoro:{bg:'bg-indigo-50 dark:bg-indigo-900/30',border:'border-indigo-500',txt:'text-indigo-600'},
+    lavoro:{bg:'bg-blue-50 dark:bg-blue-900/30',border:'border-blue-500',txt:'text-blue-600'},
     ferie: {bg:'bg-amber-50 dark:bg-amber-900/30',border:'border-amber-400',txt:'text-amber-600'},
     riposo:{bg:'bg-slate-100 dark:bg-slate-800',border:'border-slate-400',txt:'text-slate-500'},
   };
@@ -378,9 +378,9 @@ function showStats(){
   document.getElementById('stats-title').textContent=`${MONTHS[cm]} ${cy}`;
   document.getElementById('stats-body').innerHTML=`
     <div class="grid grid-cols-2 gap-3 mb-4">
-      <div class="col-span-2 rounded-2xl p-4 ${saldo>=0?'bg-indigo-50 dark:bg-indigo-900/20':'bg-red-50 dark:bg-red-900/20'}">
-        <div class="text-xs font-semibold uppercase tracking-wider ${saldo>=0?'text-indigo-400':'text-red-400'} mb-1">D — Saldo</div>
-        <div class="text-4xl font-extrabold font-mono ${saldo>=0?'text-indigo-600 dark:text-indigo-400':'text-red-500'}">${saldo>0?'+':''}${saldo}</div>
+      <div class="col-span-2 rounded-2xl p-4 ${saldo>=0?'bg-blue-50 dark:bg-blue-900/20':'bg-red-50 dark:bg-red-900/20'}">
+        <div class="text-xs font-semibold uppercase tracking-wider ${saldo>=0?'text-blue-400':'text-red-400'} mb-1">D — Saldo</div>
+        <div class="text-4xl font-extrabold font-mono ${saldo>=0?'text-blue-600 dark:text-blue-400':'text-red-500'}">${saldo>0?'+':''}${saldo}</div>
         <div class="text-xs text-gray-400 mt-1">buoni maturati − buoni usati</div>
       </div>
       <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
