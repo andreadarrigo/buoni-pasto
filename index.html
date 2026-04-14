@@ -103,12 +103,12 @@ body{-webkit-font-smoothing:antialiased}
       <div class="rounded-xl px-2.5 py-2" id="saldo-gen-card">
         <div class="text-[9px] opacity-70 uppercase tracking-wide mb-0.5">Buoni disponibili</div>
         <div class="text-xl font-extrabold font-mono leading-none" id="stat-saldo-gen">0</div>
-        <div class="text-[9px] opacity-50 mt-0.5">netto scadenze</div>
+        <div class="text-[9px] opacity-50 mt-0.5" id="saldo-gen-sub">netto scadenze</div>
       </div>
       <div class="rounded-xl px-2.5 py-2" id="euro-saldo-gen-card">
         <div class="text-[9px] opacity-70 uppercase tracking-wide mb-0.5">€ disponibili</div>
         <div class="text-xl font-extrabold font-mono leading-none" id="stat-euro-saldo-gen">€0</div>
-        <div class="text-[9px] opacity-50 mt-0.5">netto scadenze</div>
+        <div class="text-[9px] opacity-50 mt-0.5" id="euro-saldo-gen-sub">netto scadenze</div>
       </div>
     </div>
   </div>
@@ -362,6 +362,8 @@ function calcSaldo(){
       result.groups.push({year,count:leftover,date:`31/12/${year}`});
     }
   }
+  // Se dopo il FIFO rimane ancora spesa non coperta → saldo negativo (debito da conguagliare)
+  if(spent>0) result.available=-spent;
   return result;
 }
 
@@ -444,6 +446,9 @@ function updateStats(){
   setEl('stat-euro-saldo-gen', (euroSaldoGen>0?'+':'')+'€'+euroSaldoGen);
   colorCard('saldo-gen-card','stat-saldo-gen',saldoGen);
   colorCard('euro-saldo-gen-card','stat-euro-saldo-gen',euroSaldoGen);
+  // Aggiorna la label di stato in base al segno
+  const subLabel=saldoGen<0?'da conguagliare':'netto scadenze';
+  ['saldo-gen-sub','euro-saldo-gen-sub'].forEach(id=>setEl(id,subLabel));
 
 }
 
