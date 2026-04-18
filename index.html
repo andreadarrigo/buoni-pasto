@@ -701,10 +701,20 @@ function exportCSVAuto(){
   showToast('Backup settimanale eseguito ✓');
 }
 
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+
 function checkWeeklyExport(){
   const last=parseInt(localStorage.getItem('bp_last_export')||'0');
   const WEEK=7*24*60*60*1000;
-  if(Date.now()-last>=WEEK && Object.keys(_cache).length>0) exportCSVAuto();
+  if(Date.now()-last>=WEEK && Object.keys(_cache).length>0){
+    if(isIOS){
+      // Su iOS il download mostra un prompt fastidioso: si usa solo il backup localStorage (già aggiornato ad ogni salvataggio)
+      localStorage.setItem('bp_last_export',Date.now().toString());
+      showToast('💾 Dati al sicuro nel backup locale');
+    } else {
+      exportCSVAuto();
+    }
+  }
 }
 
 async function requestPersistentStorage(){
