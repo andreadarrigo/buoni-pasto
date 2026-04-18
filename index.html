@@ -322,8 +322,8 @@ function openDB(){return new Promise((res,rej)=>{if(_db){res(_db);return;}const 
 function dbSet(k,v){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').put(v,k).onsuccess=()=>res();tx.onerror=()=>rej();}));}
 function dbDel(k){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').delete(k).onsuccess=()=>res();tx.onerror=()=>rej();}));}
 function dbGetAll(){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('data','readonly'),store=tx.objectStore('data'),keys=[],vals=[];store.openCursor().onsuccess=e=>{const c=e.target.result;if(c){keys.push(c.key);vals.push(c.value);c.continue();}else{const o={};keys.forEach((k,i)=>o[k]=vals[i]);res(o);}};tx.onerror=()=>rej();}));}
-function saveEntry(k,v){_cache[k]=v;dbSet(k,v).catch(()=>{});}
-function deleteEntry(k){delete _cache[k];dbDel(k).catch(()=>{});}
+function saveEntry(k,v){_cache[k]=v;dbSet(k,v).catch(()=>{});localStorage.setItem('bp_backup',JSON.stringify(_cache));}
+function deleteEntry(k){delete _cache[k];dbDel(k).catch(()=>{});localStorage.setItem('bp_backup',JSON.stringify(_cache));}
 function sk(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 
 // Calcolo saldo cumulativo con regola di scadenza e consumo FIFO
@@ -667,9 +667,42 @@ self.addEventListener('fetch',e=>{
 function lockScroll(){ document.body.style.overflow='hidden'; }
 function unlockScroll(){ document.body.style.overflow=''; }
 
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:12px;font-weight:600;padding:8px 16px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap';
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>{t.style.opacity='1';setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},3000);});
+}
+
+function exportCSVAuto(){
+  if(!Object.keys(_cache).length) return;
+  const rows=[['Data','Giorno','Tipo','Buoni usati','Accumulato','Valore €']];
+  Object.keys(_cache).sort().forEach(k=>{
+    const e=_cache[k],[ky,kmo,kd]=k.split('-').map(Number);
+    const di=((new Date(ky,kmo-1,kd).getDay())||7)-1;
+    rows.push([k,DAYS_LONG[di],e.type||'',e.bp||0,e.acc?'Sì':'No',(e.bp||0)*BP]);
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+rows.map(r=>r.join(';')).join('\n')],{type:'text/csv;charset=utf-8'}));
+  a.download='buoni_pasto_backup.csv';
+  a.click();
+  localStorage.setItem('bp_last_export',Date.now().toString());
+  showToast('Backup settimanale eseguito ✓');
+}
+
+function checkWeeklyExport(){
+  const last=parseInt(localStorage.getItem('bp_last_export')||'0');
+  const WEEK=7*24*60*60*1000;
+  if(Date.now()-last>=WEEK && Object.keys(_cache).length>0) exportCSVAuto();
+}
+
 async function initData(){
-  try{_cache=await dbGetAll();}catch(_){try{_cache=JSON.parse(localStorage.getItem('bp_data')||'{}');}catch(e){}}
+  try{_cache=await dbGetAll();}catch(_){
+    try{_cache=JSON.parse(localStorage.getItem('bp_backup')||localStorage.getItem('bp_data')||'{}');}catch(e){}
+  }
   renderCal();
+  checkWeeklyExport();
 }
 initData();
 </script>
